@@ -1,8 +1,11 @@
 <template>
     <div class="wrapper">
-        <button>Test Before</button>
+        <p>{{value}} - {{valid ? 'valid' : 'invalid'}}</p><br>
+        
         <mui-input v-model="value"/>
-        <button>Test After</button>
+        <mui-input label="Text Input" v-model="value"/>
+        <mui-input placeholder="Food, Apples etc" v-model="value"/>
+        <mui-input label="Text Input" placeholder="Food, Apples etc" v-model="value"/>
     </div>
 </template>
 
@@ -23,7 +26,11 @@
 </script>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
     .wrapper {
         --primary: #005cd4;
+        font-size: 16px;
+        font-family: 'Inter', 'Roboto', sans-serif;
     }
 </style>
