@@ -18,12 +18,16 @@
             @keydown.enter="inputEvent('enter', $event)"
             >
         
-        <div class="border" v-if="!noBorder"></div>
-
         <div class="label" v-if="label">{{label}}</div>
+
         <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
 
-        <div class="chars" v-if="showMax__">{{value__.length}} / {{max__}}</div>
+        <div class="border" v-if="!noBorder"></div>
+
+        <div class="bottom-bar" v-if="hasBottomBar__">
+            <div class="helper-text" v-if="helper">{{helper}}</div>
+            <div class="max-text" v-if="showMax__">{{value__.length}} / {{max__}}</div>
+        </div>
     </div>
 </template>
 
@@ -54,6 +58,10 @@
             },
 
             placeholder: {
+                type: String,
+            },
+
+            helper: {
                 type: String,
             },
 
@@ -120,13 +128,13 @@
             },
 
             min__() {
-                if (isNaN(Number(this.min))) return Number(this.min)
+                if (!isNaN(Number(this.min)) && this.min !== null) return Number(this.min)
 
                 return null
             },
 
             max__() {
-                if (isNaN(Number(this.max))) return Number(this.max)
+                if (!isNaN(Number(this.max)) && this.max !== null) return Number(this.max)
 
                 return null
             },
@@ -134,10 +142,11 @@
             classes__() {
                 return {
                     'focused': this.focus__,
+                    'filled': this.value__.length > 0,
                     'focused-or-filled': this.focusedOrFilled__,
                     'invalid': !this.valid__,
                     'has-label': this.label,
-                    'spacer': this.showMax__,
+                    'bottom-bar-space': this.hasBottomBar__,
                 }
             },
 
@@ -147,6 +156,10 @@
                 if (this.max__ === null) return false
 
                 return true
+            },
+
+            hasBottomBar__() {
+                return this.helper || this.showMax__
             },
 
             focusedOrFilled__() {
@@ -169,16 +182,6 @@
                 }
             },
 
-            inputFocus(event) {
-                
-                this.$emit('focus', event)
-            },
-
-            inputBlur(event) {
-                this.focus__ = false
-                this.$emit('blur', event)
-            },
-
             validate() {
                 this.$emit('update:valid', this.valid__)
             },
@@ -188,14 +191,15 @@
 
 <style lang="sass" scoped>
     .mui-container
-        --mui-height: 3rem
+        font-size: 1rem
+        --mui-height: 3em
         --mui-background: #fff
         --mui-color: #000
         --mui-color-light: #666
 
         height: var(--mui-height)
         background: var(--mui-background)
-        border-radius: .325rem
+        border-radius: .325em
         position: relative
 
         *
@@ -204,6 +208,10 @@
         &.focused
             .border
                 border: 1px solid #222
+
+        &.filled
+            .placeholder
+                opacity: 0
 
         &.focused-or-filled
             .progress-bar
@@ -216,8 +224,15 @@
             .input
                 padding-top: 1rem !important
 
-        &.spacer
-            margin-bottom: 1rem
+            .placeholder
+                padding-top: 1rem !important
+
+            &:not(.focused)
+                .placeholder
+                    opacity: 0
+
+        &.bottom-bar-space
+            margin-bottom: 1em
 
         &.invalid
             .border
@@ -238,14 +253,16 @@
             pointer-events: none
 
         .label
-            font-size: 1rem
-            height: var(--mui-height)
+            font-size: inherit
+            height: 100%
             width: 100%
-            line-height: calc(var(--mui-height) + 3px)
+            line-height: 1.5
             position: absolute
             top: 0
             left: 0
-            padding: 0 1rem
+            display: flex
+            align-items: center
+            padding: 0 1em
             white-space: nowrap
             overflow: hidden
             text-overflow: ellipsis
@@ -255,37 +272,67 @@
             color: var(--mui-color-light)
             transform-origin: top left
 
-        .chars
-            font-size: 10px
-            max-width: 100%
-            line-height: 16px
+        .placeholder
+            font-size: inherit
+            height: 100%
+            width: 100%
+            line-height: 1.5
             position: absolute
-            right: 11px
-            bottom: -1rem
-            text-align: right
+            top: 0
+            left: 0
+            display: flex
+            align-items: center
+            padding: 0 1em
             white-space: nowrap
             overflow: hidden
             text-overflow: ellipsis
+            text-align: left
             pointer-events: none
-            color: var(--mui-color)
+            transition: all 200ms
+            color: var(--mui-color-light)
+            transform-origin: top left
+
+        .bottom-bar
+            height: 1em
+            width: 100%
+            position: absolute
+            bottom: -1em
+            left: 0
+            gap: 1em
+            padding: 0 1em
+            display: flex
+            align-items: center
+            user-select: none
+            pointer-events: none
+
+            .helper-text
+                font-size: .6em
+                color: var(--mui-color)
+                line-height: 1.5
+                flex: 1
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
+
+            .max-text
+                font-size: .6em
+                color: var(--mui-color)
+                line-height: 1.5
+                white-space: nowrap
+                overflow: hidden
+                text-overflow: ellipsis
 
         .input
             height: 100%
             width: 100%
-            padding: 0 1rem
+            padding: 0 1em
             border: none
             background: none
             border-radius: inherit
             font-family: inherit
-            font-size: 1rem
+            font-size: inherit
             color: var(--mui-color)
 
             &:focus
                 outline: none
-
-            &::placeholder
-                color: var(--mui-color-light)
-                font-size: 1rem
-                font-family: inherit
-                user-select: none
 </style>
