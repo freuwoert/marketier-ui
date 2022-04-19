@@ -3,11 +3,12 @@
         <p>{{value}} - {{valid ? 'valid' : 'invalid'}}</p>
         
         <mui-input v-model="value"/>
-        <mui-input label="Text Input" v-model="value"/>
+        <mui-input label="Text Input" disabled v-model="value"/>
         <mui-input placeholder="Food, Apples etc" v-model="value"/>
         <mui-input label="Text Input" placeholder="Food, Apples etc" v-model="value"/>
-        <mui-input label="Text Input" :helper="'Helper text ( a-Z 0-9 - _ )'" v-model="value"/>
-        <mui-input label="Text Input" :helper="'Helper text ( a-Z 0-9 - _ )'" max="50" v-model="value"/>
+        <mui-input label="Text Input" helper="Helper text" v-model="value"/>
+        <mui-input label="Text Input" helper="Helper text" max="50" v-model="value"/>
+        <mui-input label="Password Input" type="password" v-model="value"/>
     </div>
 </template>
 

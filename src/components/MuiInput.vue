@@ -4,8 +4,10 @@
         <input ref="input" class="input"
             :autocomplete="autocomplete"
             :spellcheck="spellcheck"
+            :disabled="disabled"
+            :tabindex="tabindex__"
             :name="name"
-            :type="type__"
+            :type="computedType__"
             v-model="value__"
             @input="input($event.target.value)"
             @focus="inputEvent('focus', $event)"
@@ -17,12 +19,17 @@
             @keydown.esc="inputEvent('esc', $event)"
             @keydown.enter="inputEvent('enter', $event)"
             >
-        
-        <div class="label" v-if="label">{{label}}</div>
-
-        <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
 
         <div class="border" v-if="!noBorder"></div>
+        <div class="slot slot-left">
+            <slot class="left"></slot>
+        </div>
+        <div class="slot slot-right">
+            <slot class="right"></slot>
+        </div>
+        
+        <div class="label" v-if="label">{{label}}</div>
+        <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
 
         <div class="bottom-bar" v-if="hasBottomBar__">
             <div class="helper-text" v-if="helper">{{helper}}</div>
@@ -65,6 +72,16 @@
                 type: String,
             },
 
+            disabled: {
+                type: Boolean,
+                default: false,
+            },
+
+            tabindex: {
+                type: [Number, String],
+                default: 0,
+            },
+
             autocomplete: {
                 type: String,
                 default: 'off',
@@ -101,7 +118,7 @@
                 value__: '',
                 valid__: true,
                 focus__: false,
-                visible__: false,
+                obfuscated__: true,
                 score: 0,
                 errors: {},
             }
@@ -127,6 +144,16 @@
                 return 'text'
             },
 
+            computedType__() {
+                if (this.type__ === 'password') return this.obfuscated__ ? 'password' : 'text'
+
+                return this.type__
+            },
+
+            tabindex__() {
+                return Number(this.tabindex)
+            },
+
             min__() {
                 if (!isNaN(Number(this.min)) && this.min !== null) return Number(this.min)
 
@@ -147,6 +174,7 @@
                     'invalid': !this.valid__,
                     'has-label': this.label,
                     'bottom-bar-space': this.hasBottomBar__,
+                    'disabled': this.disabled,
                 }
             },
 
@@ -182,6 +210,10 @@
                 }
             },
 
+            toggleObfuscated() {
+                this.obfuscated__ = !this.obfuscated__
+            },
+
             validate() {
                 this.$emit('update:valid', this.valid__)
             },
@@ -192,12 +224,20 @@
 <style lang="sass" scoped>
     .mui-container
         font-size: 1rem
-        --mui-height: 3em
         --mui-background: #fff
+        --mui-border-color: #888
         --mui-color: #000
         --mui-color-light: #666
 
-        height: var(--mui-height)
+        --mui-disabled-background: #fafafa
+        --mui-disabled-border-color: #aaa
+
+        --mui-focused-border-color: #222
+
+        --mui-invalid-color: #f00
+        --mui-invalid-border-color: #f00
+
+        height: 3rem
         background: var(--mui-background)
         border-radius: .325em
         position: relative
@@ -207,7 +247,7 @@
 
         &.focused
             .border
-                border: 1px solid #222
+                border-color: var(--mui-focused-border-color)
 
         &.filled
             .placeholder
@@ -232,13 +272,20 @@
                     opacity: 0
 
         &.bottom-bar-space
-            margin-bottom: 1em
+            margin-bottom: 1.3em
+
+        &.disabled
+            background: var(--mui-disabled-background)
+
+            .border
+                border-color: var(--mui-disabled-border-color)
 
         &.invalid
             .border
-                border-color: red
-            .chars
-                color: red
+                border-color: var(--mui-invalid-border-color)
+            .max-text,
+            .helper-text
+                color: var(--mui-invalid-color)
 
         .border
             height: 100%
@@ -249,7 +296,7 @@
             border-radius: inherit
             border-width: 1px
             border-style: solid
-            border-color: #888
+            border-color: var(--mui-border-color)
             pointer-events: none
 
         .label
@@ -293,20 +340,20 @@
             transform-origin: top left
 
         .bottom-bar
-            height: 1em
+            height: 1.3em
             width: 100%
             position: absolute
-            bottom: -1em
+            bottom: -1.3em
             left: 0
             gap: 1em
             padding: 0 1em
             display: flex
-            align-items: center
+            align-items: flex-end
             user-select: none
             pointer-events: none
 
             .helper-text
-                font-size: .6em
+                font-size: .75em
                 color: var(--mui-color)
                 line-height: 1.5
                 flex: 1
@@ -315,7 +362,7 @@
                 text-overflow: ellipsis
 
             .max-text
-                font-size: .6em
+                font-size: .75em
                 color: var(--mui-color)
                 line-height: 1.5
                 white-space: nowrap
