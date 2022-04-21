@@ -4,11 +4,18 @@
         
         <mui-input v-model="value"/>
         <mui-input label="Text Input" disabled v-model="value"/>
-        <mui-input placeholder="Food, Apples etc" v-model="value"/>
+        <mui-input label="Email" placeholder="contact@example.com" v-model="value">
+            <template v-slot:left>
+                <svg xmlns="http://www.w3.org/2000/svg" height="1.25rem" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                </svg>
+            </template>
+        </mui-input>
+        <mui-input placeholder="Search" icon-left="search" v-model="value"/>
         <mui-input label="Text Input" placeholder="Food, Apples etc" v-model="value"/>
         <mui-input label="Text Input" helper="Helper text" v-model="value"/>
         <mui-input label="Text Input" helper="Helper text" max="50" v-model="value"/>
-        <mui-input label="Password Input" type="password" v-model="value"/>
+        <mui-input label="Password Input" type="password" v-model="value" icon-right="visibility"/>
     </div>
 </template>
 
