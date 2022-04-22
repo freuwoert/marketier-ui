@@ -9,13 +9,23 @@
 
         <div class="input-wrapper">
             <input ref="input" class="input"
+                :pattern="pattern"
                 :autocomplete="autocomplete"
                 :spellcheck="spellcheck"
                 :disabled="disabled"
+                :required="required"
                 :tabindex="tabindex__"
                 :name="name"
+                :title="computedTitle__"
                 :type="computedType__"
+                :min="min__"
+                :max="max__"
+                :minlength="min__"
+                :maxlength="max__"
                 v-model="value__"
+                :aria-required="required"
+                :aria-label="label"
+                :aria-disabled="disabled"
                 @input="input($event.target.value)"
                 @focus="inputEvent('focus', $event)"
                 @blur="inputEvent('blur', $event)"
@@ -42,7 +52,7 @@
         </div>
 
         <div class="bottom-bar" v-if="hasBottomBar__">
-            <div class="helper-text" v-if="helper">{{helper}}</div>
+            <div class="helper-text" v-if="helperText__">{{helperText__}}</div>
             <div class="max-text" v-if="showMax__">{{value__.length}} / {{max__}}</div>
         </div>
     </label>
@@ -82,12 +92,25 @@
                 type: String,
             },
 
+            title: {
+                type: String,
+            },
+
+            errorText: {
+                type: String,
+            },
+
             iconLeft: {
                 type: String,
             },
 
             iconRight: {
                 type: String,
+            },
+
+            required: {
+                type: Boolean,
+                default: false,
             },
 
             disabled: {
@@ -98,6 +121,10 @@
             tabindex: {
                 type: [Number, String],
                 default: 0,
+            },
+
+            pattern: {
+                type: String,
             },
 
             autocomplete: {
@@ -137,13 +164,13 @@
                 valid__: true,
                 focus__: false,
                 obfuscated__: true,
-                score: 0,
+                score__: 0,
                 errors: {},
             }
         },
         
         mounted() {
-
+            this.instantValidation()
         },
 
         watch: {
@@ -151,6 +178,7 @@
                 immediate: true,
                 handler(newValue) {
                     this.value__ = newValue
+                    this.instantValidation()
                 },
             },
         },
@@ -166,6 +194,17 @@
                 if (this.type__ === 'password') return this.obfuscated__ ? 'password' : 'text'
 
                 return this.type__
+            },
+
+            computedTitle__() {
+                if (this.title) return this.title
+                else if (this.errorText && !this.valid__) return this.errorText
+                else return ''
+            },
+
+            helperText__() {
+                // Prefer error text (if invalid) over helper text over null
+                return (!this.valid__ ? this.errorText : null) || this.helper || null
             },
 
             iconLeft__() {
@@ -214,13 +253,17 @@
             showMax__() {
                 if (this.hideMax) return false
 
+                // Can't show max if there's no max set
                 if (this.max__ === null) return false
+
+                // Number inputs don't need a character counter
+                if (this.type__ === 'number') return false
 
                 return true
             },
 
             hasBottomBar__() {
-                return this.helper || this.showMax__
+                return this.helperText__ || this.showMax__
             },
 
             hasLeftSlot__() {
@@ -243,7 +286,7 @@
                 switch (type)
                 {
                     case 'focus': this.focus__ = true; break;
-                    case 'blur': this.focus__ = false; break;
+                    case 'blur': this.focus__ = false; this.onBlurValidation(); break;
                 }
             },
 
@@ -251,8 +294,32 @@
                 this.obfuscated__ = !this.obfuscated__
             },
 
-            validate() {
+            onBlurValidation() {
+                if (this.disabled || !this.$refs.input) return
+
+                this.valid__ = this.validate(['badInput', 'patternMismatch', 'rangeOverflow', 'rangeUnderflow', 'stepMismatch', 'tooLong', 'tooShort', 'typeMismatch', 'valueMissing'])
+
                 this.$emit('update:valid', this.valid__)
+            },
+
+            instantValidation() {
+                if (this.disabled || !this.$refs.input) return
+
+                this.valid__ = this.validate(['badInput', 'patternMismatch', 'tooLong'])
+
+                this.$emit('update:valid', this.valid__)
+            },
+
+            validate(watch = []) {
+                let validation = this.$refs.input.validity
+                let relevantValidation = []
+
+                for (const check of watch)
+                {
+                    if (validation[check] !== undefined) relevantValidation.push(validation[check])
+                }
+
+                return !relevantValidation.some(e => e === true)
             },
         },
     }
@@ -339,9 +406,14 @@
         &.invalid
             .border
                 border-color: var(--mui-invalid-border-color)
-            .max-text,
-            .helper-text
+
+            .slot-wrapper
                 color: var(--mui-invalid-color)
+
+            .bottom-bar
+                .max-text,
+                .helper-text
+                    color: var(--mui-invalid-color)
 
         .slot-wrapper
             aspect-ratio: 1
@@ -371,7 +443,7 @@
                     transform: rotate(45deg) scaleY(0)
                     transform-origin: center top
                     background: var(--mui-background)
-                    border-left: 2px solid var(--mui-color-light)
+                    border-left: 2px solid currentColor
                     border-right: 2px solid var(--mui-background)
 
             .icon
@@ -490,4 +562,5 @@
                 white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
+                justify-self: flex-end
 </style>

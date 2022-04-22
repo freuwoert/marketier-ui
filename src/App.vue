@@ -1,8 +1,6 @@
 <template>
     <div class="wrapper">
-        <p>{{value}} - {{valid ? 'valid' : 'invalid'}}</p>
-        
-        <mui-input v-model="value"/>
+        <!-- <mui-input v-model="value"/>
         <mui-input label="Text Input" disabled v-model="value"/>
         <mui-input label="Email" placeholder="contact@example.com" v-model="value">
             <template v-slot:left>
@@ -14,8 +12,10 @@
         <mui-input placeholder="Search" icon-left="search" v-model="value"/>
         <mui-input label="Text Input" placeholder="Food, Apples etc" v-model="value"/>
         <mui-input label="Text Input" helper="Helper text" v-model="value"/>
-        <mui-input label="Text Input" helper="Helper text" max="50" v-model="value"/>
-        <mui-input label="Password Input" type="password" v-model="value" icon-right="visibility"/>
+        <mui-input label="Password Input" type="password" v-model="value" icon-right="visibility"/> -->
+        <mui-input label="Text Input" helper="Helper text" pattern="[a-z]" icon-left="sort_by_alpha" v-model="value"/>
+        <mui-input type="email" label="Email Input" helper="Helper text" min="5" v-model="value"/>
+        <!-- <mui-input type="number" label="Number Input" helper="Helper text" max="5" v-model="value"/> -->
     </div>
 </template>
 
@@ -25,8 +25,7 @@
     export default {
         data() {
             return {
-                value: '',
-                valid: true,
+                value: 'ö',
             }
         },
         components: {
