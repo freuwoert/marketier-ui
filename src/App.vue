@@ -14,7 +14,7 @@
         <mui-input label="Text Input" helper="Helper text" v-model="value"/>
         <mui-input label="Password Input" type="password" v-model="value" icon-right="visibility"/> -->
         <mui-input label="Text Input" helper="Helper text" pattern="[a-z]" icon-left="sort_by_alpha" v-model="value"/>
-        <mui-input type="email" label="Email Input" helper="Helper text" min="5" v-model="value"/>
+        <mui-input type="email" label="Email Input" helper="Helper text" error-text="test1234" min="5" v-model="value"/>
         <!-- <mui-input type="number" label="Number Input" helper="Helper text" max="5" v-model="value"/> -->
     </div>
 </template>
@@ -25,7 +25,7 @@
     export default {
         data() {
             return {
-                value: 'ö',
+                value: '',
             }
         },
         components: {
