@@ -1,13 +1,14 @@
 {
   "name": "marketier-ui",
-  "description": "A modern UI input kit for Vue 3",
-  "version": "0.1.0",
+  "description": "A material-like UI input-component library for Vue 3",
+  "version": "0.1.1",
   "private": false,
   "author": {
     "name": "Maurice Freuwört",
     "email": "contact@freuwort.com"
   },
   "keywords": [
+    "ui-components",
     "inputs",
     "marketier",
     "ui"
@@ -21,10 +22,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 5050",
+    "build-library": "vue-cli-service build --target lib --name marketier-ui ./src/install.js",
     "test:unit": "vitest --environment jsdom",
     "test:e2e": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress open'",
-    "test:e2e:ci": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress run'",
-    "build-library": "vue-cli-service build --target lib --name marketier-ui ./src/install.js"
+    "test:e2e:ci": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress run'"
   },
   "dependencies": {
     "@vue/cli-service": "^5.0.4",

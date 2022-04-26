@@ -1,9 +1,9 @@
-import MuiInputComponent from "./components/MuiInput.vue"
+import MuiInput from "./components/MuiInput.vue"
 
-const MuiInput = {
-    install(Vue, options)
+const MarketierUI = {
+    install(Vue)
     {
-        Vue.component("mui-input", MuiInputComponent)
+        Vue.component("mui-input", MuiInput)
     }
 }
 
@@ -13,4 +13,9 @@ if (typeof window !== 'undefined' && window.Vue)
     window.Vue.use(MuiInput)
 }
 
-export default MuiInput
+export default MarketierUI
+
+// Export components as well
+export {
+    MuiInput
+}

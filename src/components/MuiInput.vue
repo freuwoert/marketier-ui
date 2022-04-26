@@ -66,11 +66,6 @@
                 default: '',
             },
 
-            valid: {
-                type: Boolean,
-                default: true,
-            },
-
             type: {
                 type: String,
                 default: 'text',
@@ -185,7 +180,8 @@
 
         computed: {
             type__() {
-                if (['text', 'email', 'number', 'url', 'password'].includes(this.type)) return this.type
+                // ['text', 'email', 'number', 'url', 'password'] <-- target support
+                if (['text', 'number', 'password'].includes(this.type)) return this.type
 
                 return 'text'
             },
