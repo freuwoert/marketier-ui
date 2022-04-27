@@ -1,46 +1,45 @@
 {
-  "name": "marketier-ui",
-  "description": "A material-like UI input-component library for Vue 3",
-  "version": "0.1.1",
-  "private": false,
-  "author": {
-    "name": "Maurice Freuwört",
-    "email": "contact@freuwort.com"
-  },
-  "keywords": [
-    "ui-components",
-    "inputs",
-    "marketier",
-    "ui"
-  ],
-  "repository": "https://github.com/freuwoert/marketier-ui",
-  "license": "MIT",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 5050",
-    "build-library": "vue-cli-service build --target lib --name marketier-ui ./src/install.js",
-    "test:unit": "vitest --environment jsdom",
-    "test:e2e": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress open'",
-    "test:e2e:ci": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress run'"
-  },
-  "dependencies": {
-    "@vue/cli-service": "^5.0.4",
-    "sass-loader": "^12.6.0",
-    "vue": "^3.2.31"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^2.2.2",
-    "@vue/test-utils": "^2.0.0-rc.18",
-    "cypress": "^9.5.0",
-    "jsdom": "^19.0.0",
-    "sass": "^1.49.9",
-    "start-server-and-test": "^1.14.0",
-    "vite": "^2.8.4",
-    "vitest": "^0.5.0"
-  },
-  "main": "./dist/marketier-ui.common.js"
+    "name": "marketier-ui",
+    "description": "A material-like input-component library for Vue 3",
+    "version": "0.1.2",
+    "main": "./dist/marketier-ui.umd.js",
+    "module": "./dist/marketier-ui.es.js",
+    "exports": {
+        ".": {
+            "import": "./dist/marketier-ui.es.js",
+            "require": "./dist/marketier-ui.umd.js"
+        },
+        "./dist/style.css": "./dist/style.css"
+    },
+    "private": false,
+    "author": {
+        "name": "Maurice Freuwört",
+        "email": "contact@freuwort.com"
+    },
+    "keywords": [
+        "ui-components",
+        "inputs",
+        "marketier",
+        "ui"
+    ],
+    "repository": "https://github.com/freuwoert/marketier-ui",
+    "license": "MIT",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "dependencies": {
+        "vue": "^3.2.31"
+    },
+    "devDependencies": {
+        "@vitejs/plugin-vue": "^2.2.2",
+        "sass-loader": "^12.6.0",
+        "jsdom": "^19.0.0",
+        "sass": "^1.49.9",
+        "vite": "^2.8.4",
+        "vitest": "^0.5.0"
+    }
 }

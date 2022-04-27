@@ -1,6 +1,6 @@
 import MuiInput from "./components/MuiInput.vue"
 
-const MarketierUI = {
+export default {
     install(Vue)
     {
         Vue.component("mui-input", MuiInput)
@@ -8,14 +8,7 @@ const MarketierUI = {
 }
 
 // Automatic installation if Vue has been added to the global scope.
-if (typeof window !== 'undefined' && window.Vue)
-{
-    window.Vue.use(MuiInput)
-}
-
-export default MarketierUI
-
-// Export components as well
-export {
-    MuiInput
-}
+// if (typeof window !== 'undefined' && window.Vue)
+// {
+//     window.Vue.use(MuiInput)
+// }
