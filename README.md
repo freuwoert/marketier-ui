@@ -1,14 +1,15 @@
-# 🎚️ Marketier UI 🎚️
+# Marketier UI 🎚️
 **A material-like input-component library for Vue 3.**
 ⚠️ Currently under development. ⚠️
 <br/>
 
-## ⚙️ Installation ⚙️
+## Installation ⚙️
 via NPM
 ```bash
 npm install --save marketier-ui
 ```
 *(yarn coming soon)*
+
 <br/>
 
 ## ⤵️ Import ⤵️
@@ -30,9 +31,10 @@ app.use(MarketierUI);
 app.mount("#app");
 ```
 *(local imports coming soon)*
+
 <br/>
 
-## 🪛 Usage 🪛
+## Usage 🪛
 Minimal setup
 ```html
 <mui-input type="text" v-model="value"/>
@@ -53,11 +55,12 @@ Minimal setup
 
 <br/>
 
-## 🤔 What is this "Marketier" 🤔
+## What is this "Marketier" 🤔
 Marketier is a SaaS marketing and management platform currently in its early development.
 As a result of the need for a component library this package was created.
 [Learn more about Marketier](https://marketier.solutions)
+
 <br/>
 
-## 📜 License 📜
+## License 📜
 [MIT](http://opensource.org/licenses/MIT) – 2022
