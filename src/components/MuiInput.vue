@@ -41,7 +41,7 @@
             <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
         </div>
 
-        <button type="button" class="slot-wrapper slot-right slot-button" :disabled="disabled" @click="toggleObfuscation" v-if="type__ == 'password'">
+        <button type="button" class="slot-wrapper slot-right slot-button" :disabled="disabled" @click="rightClickAction" v-if="hasRightActionButton__" :class="{'hide-button': hideRightActionButton__}">
             <slot v-if="$slots.right" name="right" class="slot right"></slot>
             <div v-else class="icon right">{{iconRight__}}</div>
         </button>
@@ -54,6 +54,10 @@
         <div class="bottom-bar" v-if="hasBottomBar__">
             <div class="helper-text" v-if="helperText__">{{helperText__}}</div>
             <div class="max-text" v-if="showMax__">{{value__.length}} / {{max__}}</div>
+        </div>
+        
+        <div class="progress-bar" v-if="hasScore__">
+            <div class="progress" :class="'score-'+score__"></div>
         </div>
     </label>
 </template>
@@ -151,6 +155,11 @@
                 type: Boolean,
                 default: false,
             },
+
+            showPasswordScore: {
+                type: Boolean,
+                default: false,
+            },
         },
 
         data() {
@@ -159,7 +168,6 @@
                 valid__: true,
                 focus__: false,
                 obfuscated__: true,
-                score__: 0,
                 errors: {},
             }
         },
@@ -180,8 +188,7 @@
 
         computed: {
             type__() {
-                // ['text', 'email', 'number', 'url', 'password'] <-- target support
-                if (['text', 'number', 'password'].includes(this.type)) return this.type
+                if (['text', 'email', 'number', 'url', 'password', 'search', 'tel'].includes(this.type)) return this.type
 
                 return 'text'
             },
@@ -227,23 +234,30 @@
                 return null
             },
 
+            filled__() {
+                return (this.value__+'').length > 0
+            },
+
             classes__() {
-                return {
-                    'focused': this.focus__,
-                    'filled': this.value__.length > 0,
-                    'focused-or-filled': this.focusedOrFilled__,
-                    'invalid': !this.valid__,
-                    'has-label': this.label,
-                    'bottom-bar-space': this.hasBottomBar__,
-                    'left-slot-space': this.hasLeftSlot__,
-                    'right-slot-space': this.hasRightSlot__,
-                    'disabled': this.disabled,
-                    'obfuscated': this.type__ === 'password' && this.obfuscated__,
-                }
+                return [
+                    `input-type-${this.type__}`,
+                    {
+                        'focused': this.focus__,
+                        'filled': this.filled__,
+                        'focused-or-filled': this.focusedOrFilled__,
+                        'invalid': !this.valid__,
+                        'has-label': this.label,
+                        'bottom-bar-space': this.hasBottomBar__,
+                        'left-slot-space': this.hasLeftSlot__,
+                        'right-slot-space': this.hasRightSlot__,
+                        'disabled': this.disabled,
+                        'obfuscated': this.type__ === 'password' && this.obfuscated__,
+                    }
+                ]
             },
 
             focusedOrFilled__() {
-                return (this.value__.length > 0 || this.focus__)
+                return (this.focus__ || this.filled__)
             },
 
             showMax__() {
@@ -269,6 +283,32 @@
             hasRightSlot__() {
                 return !!this.$slots.right || !!this.iconRight__
             },
+
+            hasRightActionButton__()
+            {
+                return ['password', 'search'].includes(this.type__)
+            },
+
+            hideRightActionButton__()
+            {
+                return this.type__ === 'search' && !this.filled__
+            },
+
+            hasPasswordValidationLibrary__() {
+                return window.zxcvbn && typeof zxcvbn === 'function'
+            },
+
+            hasScore__() {
+                return this.showPasswordScore && this.hasPasswordValidationLibrary__ && this.type__ === 'password'
+            },
+
+            score__() {
+                if (this.type__ !== 'password') return null
+
+                if (this.hasPasswordValidationLibrary__) return window.zxcvbn(this.value__).score
+
+                return 0
+            },
         },
 
         methods: {
@@ -285,10 +325,8 @@
                     case 'blur': this.focus__ = false; this.onBlurValidation(); break;
                 }
             },
+            
 
-            toggleObfuscation() {
-                this.obfuscated__ = !this.obfuscated__
-            },
 
             onBlurValidation() {
                 if (this.disabled || !this.$refs.input) return
@@ -317,6 +355,27 @@
 
                 return !relevantValidation.some(e => e === true)
             },
+
+
+            
+            rightClickAction() {
+                switch (this.type__)
+                {
+                    case 'password': this.toggleObfuscation(); break;
+                    case 'search': this.clearInput(true); break;
+                }
+            },
+
+            toggleObfuscation() {
+                this.obfuscated__ = !this.obfuscated__
+            },
+
+            clearInput(shoudFocus) {
+                this.value__ = ''
+                this.input(this.value__)
+
+                if (shoudFocus) this.$refs.input.focus()
+            },
         },
     }
 </script>
@@ -327,25 +386,25 @@
 
     .mui-container
         font-size: 1rem
-        --mui-background: #fff
-        --mui-border-color: #888
-        --mui-color: #000
-        --mui-color-light: #666
+        --mui-background__: var(--mui-background, #fff)
+        --mui-border-color__: var(--mui-border-color, #888)
+        --mui-color__: var(--mui-color, #000)
+        --mui-color-light__: var(--mui-color-light, #666)
 
-        --mui-disabled-background: #fafafa
-        --mui-disabled-border-color: #aaa
+        --mui-disabled-background__: var(--mui-disabled-background, #fafafa)
+        --mui-disabled-border-color__: var(--mui-disabled-border-color, #aaa)
 
-        --mui-focused-border-color: #222
+        --mui-focused-border-color__: var(--mui-focused-border-color, #222)
 
-        --mui-invalid-color: #f00
-        --mui-invalid-border-color: #f00
+        --mui-invalid-color__: var(--mui-invalid-color, #f00)
+        --mui-invalid-border-color__: var(--mui-invalid-border-color, #f00)
 
-        --mui-icon-font: 'Material Icons Round'
-        --left-input-padding: 1em
-        --right-input-padding: 1em
+        --mui-icon-font__: var(--mui-icon-font, 'Material Icons')
+        --mui-left-input-padding__: var(--mui-left-input-padding, 1em)
+        --mui-right-input-padding__: var(--mui-right-input-padding, 1em)
 
         height: 3rem
-        background: var(--mui-background)
+        background: var(--mui-background__)
         border-radius: .325em
         position: relative
         display: flex
@@ -353,7 +412,7 @@
 
         &.focused
             .border
-                border-color: var(--mui-focused-border-color)
+                border-color: var(--mui-focused-border-color__)
 
         &.filled
             .input-wrapper
@@ -361,10 +420,10 @@
                     opacity: 0
 
         &.focused-or-filled
-            .input-wrapper
-                .progress-bar
-                    transform: scaleY(1)
+            .progress-bar
+                transform: scaleY(1)
 
+            .input-wrapper
                 .label
                     transform: translate(2px, -5px) scale(0.72)
 
@@ -384,32 +443,32 @@
             margin-bottom: 1.3em
 
         &.left-slot-space
-            --left-input-padding: 0
+            --mui-left-input-padding__: 0px
 
         &.right-slot-space
-            --right-input-padding: 0
+            --mui-right-input-padding__: 0px
 
         &.disabled
-            background: var(--mui-disabled-background)
+            background: var(--mui-disabled-background__)
 
             .border
-                border-color: var(--mui-disabled-border-color)
+                border-color: var(--mui-disabled-border-color__)
 
-        &:not(.obfuscated)
+        &.input-type-password:not(.obfuscated)
             .slot-button:after
                 transform: rotate(45deg) scaleY(1) !important
 
         &.invalid
             .border
-                border-color: var(--mui-invalid-border-color)
+                border-color: var(--mui-invalid-border-color__)
 
             .slot-wrapper
-                color: var(--mui-invalid-color)
+                color: var(--mui-invalid-color__)
 
             .bottom-bar
                 .max-text,
                 .helper-text
-                    color: var(--mui-invalid-color)
+                    color: var(--mui-invalid-color__)
 
         .slot-wrapper
             aspect-ratio: 1
@@ -418,7 +477,7 @@
             display: flex
             align-items: center
             justify-content: center
-            color: var(--mui-color-light)
+            color: var(--mui-color-light__)
 
             &.slot-button
                 border: none
@@ -427,6 +486,11 @@
                 font-family: inherit
                 font-size: inherit
                 position: relative
+                transition: all 100ms
+
+                &.hide-button
+                    opacity: 0
+                    transform: scale(.5)
 
                 &:after
                     content: ''
@@ -438,12 +502,12 @@
                     transition: all 160ms
                     transform: rotate(45deg) scaleY(0)
                     transform-origin: center top
-                    background: var(--mui-background)
+                    background: var(--mui-background__)
                     border-left: 2px solid currentColor
-                    border-right: 2px solid var(--mui-background)
+                    border-right: 2px solid var(--mui-background__)
 
             .icon
-                font-family: var(--mui-icon-font)
+                font-family: var(--mui-icon-font__)
                 font-size: 1.25em
                 color: inherit
                 user-select: none
@@ -461,17 +525,36 @@
                 width: 100%
                 flex: 1
                 padding-block: 0
-                padding-left: var(--left-input-padding)
-                padding-right: var(--right-input-padding)
+                padding-left: var(--mui-left-input-padding__)
+                padding-right: var(--mui-right-input-padding__)
                 border: none
                 background: none
                 border-radius: inherit
                 font-family: inherit
                 font-size: inherit
-                color: var(--mui-color)
+                color: var(--mui-color__)
+
+                // Disable number arrows
+                &[type="number"]
+                    -moz-appearance: textfield
+
+                &[type="password"]::-ms-reveal,
+                &[type="password"]::-ms-clear
+                    display: none
+
+                &[type="search"]::-webkit-search-decoration,
+                &[type="search"]::-webkit-search-cancel-button,
+                &[type="search"]::-webkit-search-results-button,
+                &[type="search"]::-webkit-search-results-decoration
+                    display: none
 
                 &:focus
                     outline: none
+
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button
+                    -webkit-appearance: none
+                    margin: 0
 
             .label
                 font-size: inherit
@@ -484,15 +567,15 @@
                 display: flex
                 align-items: center
                 padding-block: 0
-                padding-left: var(--left-input-padding)
-                padding-right: var(--right-input-padding)
+                padding-left: var(--mui-left-input-padding__)
+                padding-right: var(--mui-right-input-padding__)
                 white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
                 text-align: left
                 pointer-events: none
                 transition: all 200ms
-                color: var(--mui-color-light)
+                color: var(--mui-color-light__)
                 transform-origin: top left
 
             .placeholder
@@ -506,15 +589,15 @@
                 display: flex
                 align-items: center
                 padding-block: 0
-                padding-left: var(--left-input-padding)
-                padding-right: var(--right-input-padding)
+                padding-left: var(--mui-left-input-padding__)
+                padding-right: var(--mui-right-input-padding__)
                 white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
                 text-align: left
                 pointer-events: none
                 transition: all 200ms
-                color: var(--mui-color-light)
+                color: var(--mui-color-light__)
                 transform-origin: top left
 
         .border
@@ -523,10 +606,11 @@
             position: absolute
             top: 0
             left: 0
+            z-index: 2
             border-radius: inherit
             border-width: 1px
             border-style: solid
-            border-color: var(--mui-border-color)
+            border-color: var(--mui-border-color__)
             pointer-events: none
 
         .bottom-bar
@@ -544,7 +628,7 @@
 
             .helper-text
                 font-size: .75em
-                color: var(--mui-color)
+                color: var(--mui-color__)
                 line-height: 1.5
                 flex: 1
                 white-space: nowrap
@@ -553,10 +637,53 @@
 
             .max-text
                 font-size: .75em
-                color: var(--mui-color)
+                color: var(--mui-color__)
                 line-height: 1.5
                 white-space: nowrap
                 overflow: hidden
                 text-overflow: ellipsis
                 justify-self: flex-end
+
+        .progress-bar
+            height: 3px
+            border-radius: .5rem .5rem 0 0
+            background: #00000010
+            width: calc(100% - 2em)
+            position: absolute
+            bottom: 0
+            left: 1em
+            z-index: 1
+            pointer-events: none
+            transform: scaleY(0)
+            transform-origin: center bottom
+            text-align: left
+            transition: all 200ms
+            overflow: hidden
+
+            .progress
+                height: 100%
+                transition: all 300ms
+                position: absolute
+                top: 0
+                left: 0
+
+                &.score-0
+                    width: 5%
+                    background: #eb3b5a
+
+                &.score-1
+                    width: 25%
+                    background: #ee5253
+
+                &.score-2
+                    width: 50%
+                    background: #ff9f43
+
+                &.score-3
+                    width: 75%
+                    background: #f1c40f
+
+                &.score-4
+                    width: 100%
+                    background: #2ecc71
 </style>

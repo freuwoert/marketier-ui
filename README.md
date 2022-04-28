@@ -45,7 +45,7 @@ Minimal setup
 ### Parameters
 | Parameters | Type | Default | Description |
 |--|--|--|--|
-| type | `String` | `text` | Input type. Available types: `text`, `password`, `number`|
+| type | `String` | `text` | Input type. Available types: `text`, `password`, `number`, `url`, `email`, `tel`, `search`|
 | label | `String` | `''` | Label of the input; *go-to parameter to indicate the use of the input.* |
 | placeholder | `String` | `''` | Placeholder of the input; *like a label but it doesn't make way for the entered value - it fades instead.* |
 | helper | `String` | `''` | Helper text displayed underneath the input |
@@ -53,6 +53,19 @@ Minimal setup
 | disabled | `Boolean` | `false` | Whether or not the input is disabled |
 | pattern | `String` | `''` | Validation pattern (regex) |
 | noBorder | `Boolean` | `false` | If set to `true` the input will not have a border surrounding the label, value and placeholder |
+| iconLeft | `String` | `''` | *Description coming soon* |
+| iconRight | `String` | `''` | *Description coming soon* |
+| min | `Number`, `String` | `null` | *Description coming soon* |
+| max | `Number`, `String` | `null` | *Description coming soon* |
+| spellcheck | `Boolean` | `false` | *Description coming soon* |
+| autocomplete | `String` | `'off'` | *Description coming soon* |
+| tabIndex | `Number`, `String` | `0` | *Description coming soon* |
+| errorText | `String` | `''` | *Description coming soon* |
+| title | `String` | `''` | *Description coming soon* |
+| name | `String` | `''` | *Description coming soon* |
+| hideMax | `Boolean` | `false` | *Description coming soon* |
+| showPasswordScore | `Boolean` | `false` | Displays a password strength score.¹ *Only available for the input type:* `password` |
+¹ Only available if the [dropbox/zxcvbn](https://github.com/dropbox/zxcvbn) library function is available via `window.zxcvbn` on runtime
 
 <br/>
 
