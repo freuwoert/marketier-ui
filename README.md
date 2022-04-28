@@ -64,7 +64,8 @@ Minimal setup
 | title | `String` | `''` | *Description coming soon* |
 | name | `String` | `''` | *Description coming soon* |
 | hideMax | `Boolean` | `false` | *Description coming soon* |
-| showPasswordScore | `Boolean` | `false` | Displays a password strength score.¹ *Only available for the input type:* `password` |
+| showPasswordScore | `Boolean` | `false` | Displays a password strength score.¹ *Only available for the input type:* `password` |  
+
 ¹ Only available if the [dropbox/zxcvbn](https://github.com/dropbox/zxcvbn) library function is available via `window.zxcvbn` on runtime
 
 <br/>
