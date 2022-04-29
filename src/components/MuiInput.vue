@@ -1,54 +1,91 @@
 <template>
     <label class="mui-container" :class="classes__">
-        <div class="border" v-if="!noBorder"></div>
+        <div class="box-wrapper">
+            <div class="border" v-if="!noBorder"></div>
 
-        <div class="slot-wrapper slot-left" v-if="hasLeftSlot__">
-            <slot v-if="$slots.left" name="left" class="slot left"></slot>
-            <div v-else class="icon left">{{iconLeft__}}</div>
-        </div>
+            <div class="slot-wrapper slot-left" v-if="hasLeftSlot__">
+                <slot v-if="$slots.left" name="left" class="slot left"></slot>
+                <div v-else class="icon">{{iconLeft__}}</div>
+            </div>
 
-        <div class="input-wrapper">
-            <input ref="input" class="input"
-                :pattern="pattern"
-                :autocomplete="autocomplete"
-                :spellcheck="spellcheck"
-                :disabled="disabled"
-                :required="required"
-                :tabindex="tabindex__"
-                :name="name"
-                :title="computedTitle__"
-                :type="computedType__"
-                :min="min__"
-                :max="max__"
-                :minlength="min__"
-                :maxlength="max__"
-                v-model="value__"
-                :aria-required="required"
-                :aria-label="label"
-                :aria-disabled="disabled"
-                @input="input($event.target.value)"
-                @focus="inputEvent('focus', $event)"
-                @blur="inputEvent('blur', $event)"
-                @keydown="inputEvent('keydown', $event)"
-                @keyup="inputEvent('keyup', $event)"
-                @keypress="inputEvent('keypress', $event)"
-                @change="inputEvent('change', $event)"
-                @keydown.esc="inputEvent('esc', $event)"
-                @keydown.enter="inputEvent('enter', $event)"
-                >
+            <div class="input-wrapper">
+                <textarea v-if="type__ === 'textarea'" ref="input" class="input"
+                    :pattern="pattern"
+                    :autocomplete="autocomplete"
+                    :spellcheck="spellcheck"
+                    :disabled="disabled"
+                    :required="required"
+                    :tabindex="tabindex__"
+                    :name="name"
+                    :title="computedTitle__"
+                    :minlength="min__"
+                    :maxlength="max__"
+                    v-model="value__"
+                    :aria-required="required"
+                    :aria-label="label"
+                    :aria-disabled="disabled"
+                    @input="input($event.target.value)"
+                    @focus="inputEvent('focus', $event)"
+                    @blur="inputEvent('blur', $event)"
+                    @keydown="inputEvent('keydown', $event)"
+                    @keyup="inputEvent('keyup', $event)"
+                    @keypress="inputEvent('keypress', $event)"
+                    @change="inputEvent('change', $event)"
+                    @keydown.esc="inputEvent('esc', $event)"
+                    @keydown.enter="inputEvent('enter', $event)"
+                    >
+                </textarea>
 
-            <div class="label" v-if="label">{{label}}</div>
-            <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
-        </div>
+                <input v-else ref="input" class="input"
+                    :pattern="pattern"
+                    :autocomplete="autocomplete"
+                    :spellcheck="spellcheck"
+                    :disabled="disabled"
+                    :required="required"
+                    :tabindex="tabindex__"
+                    :name="name"
+                    :title="computedTitle__"
+                    :type="computedType__"
+                    :min="min__"
+                    :max="max__"
+                    :minlength="min__"
+                    :maxlength="max__"
+                    v-model="value__"
+                    :aria-required="required"
+                    :aria-label="label"
+                    :aria-disabled="disabled"
+                    @input="input($event.target.value)"
+                    @focus="inputEvent('focus', $event)"
+                    @blur="inputEvent('blur', $event)"
+                    @keydown="inputEvent('keydown', $event)"
+                    @keyup="inputEvent('keyup', $event)"
+                    @keypress="inputEvent('keypress', $event)"
+                    @change="inputEvent('change', $event)"
+                    @keydown.esc="inputEvent('esc', $event)"
+                    @keydown.enter="inputEvent('enter', $event)"
+                    >
 
-        <button type="button" class="slot-wrapper slot-right slot-button" :disabled="disabled" @click="rightClickAction" v-if="hasRightActionButton__" :class="{'hide-button': hideRightActionButton__}">
-            <slot v-if="$slots.right" name="right" class="slot right"></slot>
-            <div v-else class="icon right">{{iconRight__}}</div>
-        </button>
+                <div class="label" v-if="label">{{label}}</div>
+                <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
+            </div>
 
-        <div class="slot-wrapper slot-right" v-else-if="hasRightSlot__">
-            <slot v-if="$slots.right" name="right" class="slot right"></slot>
-            <div v-else class="icon right">{{iconRight__}}</div>
+            <button type="button" class="slot-wrapper slot-right slot-button" :disabled="disabled" @click="clearInput(true)" v-if="hasClearButton__" :class="{'hide-button': hideClearButton__}">
+                <div class="icon">close</div>
+            </button>
+
+            <button type="button" class="slot-wrapper slot-right slot-button" :disabled="disabled" @click="toggleObfuscation()" v-if="hasObfuscationToggle__">
+                <div class="obfuscation-cross"></div>
+                <div class="icon">visibility</div>
+            </button>
+
+            <div class="slot-wrapper slot-right" v-else-if="hasRightSlot__">
+                <slot v-if="$slots.right" name="right" class="slot right"></slot>
+                <div v-else class="icon">{{iconRight__}}</div>
+            </div>
+            
+            <div class="progress-bar" v-if="hasScore__">
+                <div class="progress" :class="'score-'+score__"></div>
+            </div>
         </div>
 
         <div class="bottom-bar" v-if="hasBottomBar__">
@@ -56,9 +93,6 @@
             <div class="max-text" v-if="showMax__">{{value__.length}} / {{max__}}</div>
         </div>
         
-        <div class="progress-bar" v-if="hasScore__">
-            <div class="progress" :class="'score-'+score__"></div>
-        </div>
     </label>
 </template>
 
@@ -105,6 +139,11 @@
 
             iconRight: {
                 type: String,
+            },
+
+            clearable: {
+                type: Boolean,
+                default: false,
             },
 
             required: {
@@ -156,6 +195,11 @@
                 default: false,
             },
 
+            hideObfuscationToggle: {
+                type: Boolean,
+                default: false,
+            },
+
             showPasswordScore: {
                 type: Boolean,
                 default: false,
@@ -188,7 +232,7 @@
 
         computed: {
             type__() {
-                if (['text', 'email', 'number', 'url', 'password', 'search', 'tel'].includes(this.type)) return this.type
+                if (['text', 'email', 'number', 'url', 'password', 'search', 'tel', 'textarea'].includes(this.type)) return this.type
 
                 return 'text'
             },
@@ -200,9 +244,7 @@
             },
 
             computedTitle__() {
-                if (this.title) return this.title
-                else if (this.errorText && !this.valid__) return this.errorText
-                else return ''
+                return this.title || (this.errorText && !this.valid__) ? this.errorText : ''
             },
 
             helperText__() {
@@ -272,6 +314,14 @@
                 return true
             },
 
+            hasClearButton__() {
+                return this.clearable || this.type__ === 'search'
+            },
+
+            hideClearButton__() {
+                return !this.filled__
+            },
+
             hasBottomBar__() {
                 return this.helperText__ || this.showMax__
             },
@@ -284,14 +334,10 @@
                 return !!this.$slots.right || !!this.iconRight__
             },
 
-            hasRightActionButton__()
-            {
-                return ['password', 'search'].includes(this.type__)
-            },
 
-            hideRightActionButton__()
-            {
-                return this.type__ === 'search' && !this.filled__
+
+            hasObfuscationToggle__() {
+                return this.type__ === 'password' && !this.hideObfuscationToggle
             },
 
             hasPasswordValidationLibrary__() {
@@ -357,14 +403,6 @@
             },
 
 
-            
-            rightClickAction() {
-                switch (this.type__)
-                {
-                    case 'password': this.toggleObfuscation(); break;
-                    case 'search': this.clearInput(true); break;
-                }
-            },
 
             toggleObfuscation() {
                 this.obfuscated__ = !this.obfuscated__
@@ -386,6 +424,7 @@
 
     .mui-container
         font-size: 1rem
+        --base-height: 3em
         --mui-background__: var(--mui-background, #fff)
         --mui-border-color__: var(--mui-border-color, #888)
         --mui-color__: var(--mui-color, #000)
@@ -407,8 +446,6 @@
         background: var(--mui-background__)
         border-radius: .325em
         position: relative
-        display: flex
-        align-items: center
 
         &.focused
             .border
@@ -455,8 +492,9 @@
                 border-color: var(--mui-disabled-border-color__)
 
         &.input-type-password:not(.obfuscated)
-            .slot-button:after
-                transform: rotate(45deg) scaleY(1) !important
+            .slot-button
+                .obfuscation-cross
+                    transform: rotate(45deg) scaleY(1) !important
 
         &.invalid
             .border
@@ -470,11 +508,58 @@
                 .helper-text
                     color: var(--mui-invalid-color__)
 
+        &.input-type-textarea
+            height: auto
+
+            .box-wrapper
+                height: var(--base-height)
+                min-height: 2em
+                resize: vertical
+                overflow: hidden
+                align-items: flex-start
+                
+                .slot-wrapper
+                    aspect-ratio: unset
+                    width: 3em
+                    height: 3em
+
+                .input-wrapper
+                    .label, .placeholder
+                        height: 3em
+
+                    .input
+                        margin-top: 1em
+                        height: calc(100% - 1em)
+
+        &.input-type-textarea.has-label
+            .box-wrapper
+                .input-wrapper
+                    .label
+                        height: 3em
+
+                    .input
+                        margin-top: 1.4em
+                        height: calc(100% - 1.4em)
+                        padding-top: 0 !important
+
+
+
+        .box-wrapper
+            width: 100%
+            height: 100%
+            overflow: auto
+            position: relative
+            border-radius: inherit
+            display: flex
+            align-items: center
+
         .slot-wrapper
             aspect-ratio: 1
             height: 100%
             flex: none
             display: flex
+            padding: 0
+            margin: 0
             align-items: center
             justify-content: center
             color: var(--mui-color-light__)
@@ -487,18 +572,26 @@
                 font-size: inherit
                 position: relative
                 transition: all 100ms
+                cursor: pointer
+
+                &:disabled
+                    cursor: initial
 
                 &.hide-button
                     opacity: 0
                     transform: scale(.5)
+                    cursor: initial
+                    user-select: none
+                    pointer-events: none
 
-                &:after
+                .obfuscation-cross
                     content: ''
                     width: 0
                     height: 60%
                     position: absolute
                     right: 23%
-                    top: 28%
+                    top: 29%
+                    z-index: 1
                     transition: all 160ms
                     transform: rotate(45deg) scaleY(0)
                     transform-origin: center top
@@ -532,6 +625,7 @@
                 border-radius: inherit
                 font-family: inherit
                 font-size: inherit
+                resize: none
                 color: var(--mui-color__)
 
                 // Disable number arrows
@@ -577,6 +671,7 @@
                 transition: all 200ms
                 color: var(--mui-color-light__)
                 transform-origin: top left
+                user-select: none
 
             .placeholder
                 font-size: inherit
@@ -599,6 +694,8 @@
                 transition: all 200ms
                 color: var(--mui-color-light__)
                 transform-origin: top left
+                user-select: none
+                opacity: .8
 
         .border
             height: 100%
