@@ -3,86 +3,95 @@
         <div class="box-wrapper">
             <div class="border" v-if="!noBorder"></div>
 
-            <div class="slot-wrapper slot-left" v-if="hasLeftSlot__">
-                <slot v-if="$slots.left" name="left" class="slot left"></slot>
-                <div v-else class="icon">{{iconLeft__}}</div>
+            <div class="side-wrapper">
+                <div class="side-icon" v-if="iconLeft__"><span>{{iconLeft__}}</span></div>
+                <slot class="side-slot" v-if="$slots.left" name="left"></slot>
             </div>
 
             <div class="input-wrapper">
-                <textarea v-if="type__ === 'textarea'" ref="input" class="input"
-                    :pattern="pattern"
-                    :autocomplete="autocomplete"
-                    :spellcheck="spellcheck"
-                    :disabled="disabled"
-                    :required="required"
-                    :tabindex="tabindex__"
-                    :name="name"
-                    :title="computedTitle__"
-                    :minlength="min__"
-                    :maxlength="max__"
-                    v-model="value__"
-                    :aria-required="required"
-                    :aria-label="label"
-                    :aria-disabled="disabled"
-                    @input="input($event.target.value)"
-                    @focus="inputEvent('focus', $event)"
-                    @blur="inputEvent('blur', $event)"
-                    @keydown="inputEvent('keydown', $event)"
-                    @keyup="inputEvent('keyup', $event)"
-                    @keypress="inputEvent('keypress', $event)"
-                    @change="inputEvent('change', $event)"
-                    @keydown.esc="inputEvent('esc', $event)"
-                    @keydown.enter="inputEvent('enter', $event)"
-                    >
-                </textarea>
-
-                <input v-else ref="input" class="input"
-                    :pattern="pattern"
-                    :autocomplete="autocomplete"
-                    :spellcheck="spellcheck"
-                    :disabled="disabled"
-                    :required="required"
-                    :tabindex="tabindex__"
-                    :name="name"
-                    :title="computedTitle__"
-                    :type="computedType__"
-                    :min="min__"
-                    :max="max__"
-                    :minlength="min__"
-                    :maxlength="max__"
-                    v-model="value__"
-                    :aria-required="required"
-                    :aria-label="label"
-                    :aria-disabled="disabled"
-                    @input="input($event.target.value)"
-                    @focus="inputEvent('focus', $event)"
-                    @blur="inputEvent('blur', $event)"
-                    @keydown="inputEvent('keydown', $event)"
-                    @keyup="inputEvent('keyup', $event)"
-                    @keypress="inputEvent('keypress', $event)"
-                    @change="inputEvent('change', $event)"
-                    @keydown.esc="inputEvent('esc', $event)"
-                    @keydown.enter="inputEvent('enter', $event)"
-                    >
-
                 <div class="label" v-if="label">{{label}}</div>
-                <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
+                
+                <div class="inner-input-wrapper">
+                    <span class="prefix" v-if="prefix">{{prefix}}</span>
+
+                    <div class="input-compactor">
+                        <textarea v-if="type__ === 'textarea'" ref="input" class="input"
+                            :pattern="pattern"
+                            :autocomplete="autocomplete"
+                            :spellcheck="spellcheck"
+                            :disabled="disabled"
+                            :required="required"
+                            :tabindex="tabindex__"
+                            :name="name"
+                            :title="computedTitle__"
+                            :minlength="min__"
+                            :maxlength="max__"
+                            v-model="value__"
+                            :aria-required="required"
+                            :aria-label="label"
+                            :aria-disabled="disabled"
+                            @input="input($event.target.value)"
+                            @focus="inputEvent('focus', $event)"
+                            @blur="inputEvent('blur', $event)"
+                            @keydown="inputEvent('keydown', $event)"
+                            @keyup="inputEvent('keyup', $event)"
+                            @keypress="inputEvent('keypress', $event)"
+                            @change="inputEvent('change', $event)"
+                            @keydown.esc="inputEvent('esc', $event)"
+                            @keydown.enter="inputEvent('enter', $event)"
+                            >
+                        </textarea>
+
+                        <input v-else ref="input" class="input"
+                            :pattern="pattern"
+                            :autocomplete="autocomplete"
+                            :spellcheck="spellcheck"
+                            :disabled="disabled"
+                            :required="required"
+                            :tabindex="tabindex__"
+                            :name="name"
+                            :title="computedTitle__"
+                            :type="computedType__"
+                            :min="min__"
+                            :max="max__"
+                            :minlength="min__"
+                            :maxlength="max__"
+                            v-model="value__"
+                            :aria-required="required"
+                            :aria-label="label"
+                            :aria-disabled="disabled"
+                            @input="input($event.target.value)"
+                            @focus="inputEvent('focus', $event)"
+                            @blur="inputEvent('blur', $event)"
+                            @keydown="inputEvent('keydown', $event)"
+                            @keyup="inputEvent('keyup', $event)"
+                            @keypress="inputEvent('keypress', $event)"
+                            @change="inputEvent('change', $event)"
+                            @keydown.esc="inputEvent('esc', $event)"
+                            @keydown.enter="inputEvent('enter', $event)"
+                            >
+
+                        <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
+                    </div>
+
+                    <span class="suffix" v-if="suffix">{{suffix}}</span>
+                </div>
             </div>
 
-            <button type="button" class="slot-wrapper slot-right slot-button" :disabled="disabled" @click="clearInput(true)" v-if="hasClearButton__" :class="{'hide-button': hideClearButton__}">
-                <div class="icon">close</div>
-            </button>
+            <div class="side-wrapper">
+                <button type="button" class="side-button" :disabled="disabled || hideClearButton__" @click="clearInput(true)" v-if="hasClearButton__" :class="{'hide-button': hideClearButton__}">
+                    <close-icon />
+                </button>
 
-            <button type="button" class="slot-wrapper slot-right slot-button" :disabled="disabled" @click="toggleObfuscation()" v-if="hasObfuscationToggle__">
-                <div class="obfuscation-cross"></div>
-                <div class="icon">visibility</div>
-            </button>
+                <button type="button" class="side-button" :disabled="disabled" @click="toggleObfuscation()" v-if="hasObfuscationToggle__">
+                    <div class="obfuscation-cross"></div>
+                    <visibility-icon />
+                </button>
 
-            <div class="slot-wrapper slot-right" v-else-if="hasRightSlot__">
-                <slot v-if="$slots.right" name="right" class="slot right"></slot>
-                <div v-else class="icon">{{iconRight__}}</div>
+                <div class="side-icon" v-if="iconRight__"><span>{{iconRight__}}</span></div>
+                <slot class="side-slot" v-if="$slots.right" name="right"></slot>
             </div>
-            
+                
             <div class="progress-bar" v-if="hasScore__">
                 <div class="progress" :class="'score-'+score__"></div>
             </div>
@@ -97,6 +106,9 @@
 </template>
 
 <script>
+    import CloseIcon from '@/components/icons/Close.vue'
+    import VisibilityIcon from '@/components/icons/Visibility.vue'
+
     export default {
         props: {
             modelValue: {
@@ -139,6 +151,19 @@
 
             iconRight: {
                 type: String,
+            },
+
+            prefix: {
+                type: String,
+            },
+
+            suffix: {
+                type: String,
+            },
+
+            resize: {
+                type: String,
+                default: 'none',
             },
 
             clearable: {
@@ -232,9 +257,7 @@
 
         computed: {
             type__() {
-                if (['text', 'email', 'number', 'url', 'password', 'search', 'tel', 'textarea'].includes(this.type)) return this.type
-
-                return 'text'
+                return ['text', 'email', 'number', 'url', 'password', 'search', 'tel', 'textarea'].includes(this.type) ? this.type : 'text'
             },
 
             computedType__() {
@@ -245,6 +268,10 @@
 
             computedTitle__() {
                 return this.title || (this.errorText && !this.valid__) ? this.errorText : ''
+            },
+
+            resize__() {
+                return ['none', 'vertical', 'horizontal', 'both'].includes(this.resize) ? this.resize : 'none'
             },
 
             helperText__() {
@@ -283,6 +310,7 @@
             classes__() {
                 return [
                     `input-type-${this.type__}`,
+                    `input-resize-${this.resize__}`,
                     {
                         'focused': this.focus__,
                         'filled': this.filled__,
@@ -290,8 +318,6 @@
                         'invalid': !this.valid__,
                         'has-label': this.label,
                         'bottom-bar-space': this.hasBottomBar__,
-                        'left-slot-space': this.hasLeftSlot__,
-                        'right-slot-space': this.hasRightSlot__,
                         'disabled': this.disabled,
                         'obfuscated': this.type__ === 'password' && this.obfuscated__,
                     }
@@ -324,14 +350,6 @@
 
             hasBottomBar__() {
                 return this.helperText__ || this.showMax__
-            },
-
-            hasLeftSlot__() {
-                return !!this.$slots.left || !!this.iconLeft__
-            },
-
-            hasRightSlot__() {
-                return !!this.$slots.right || !!this.iconRight__
             },
 
 
@@ -415,6 +433,11 @@
                 if (shoudFocus) this.$refs.input.focus()
             },
         },
+
+        components: {
+            CloseIcon,
+            VisibilityIcon,
+        },
     }
 </script>
 
@@ -426,6 +449,7 @@
         font-size: 1rem
         --base-height: 3em
         --mui-background__: var(--mui-background, #fff)
+        --mui-background-secondary__: var(--mui-background-secondary, #00000020)
         --mui-border-color__: var(--mui-border-color, #888)
         --mui-color__: var(--mui-color, #000)
         --mui-color-light__: var(--mui-color-light, #666)
@@ -439,8 +463,7 @@
         --mui-invalid-border-color__: var(--mui-invalid-border-color, #f00)
 
         --mui-icon-font__: var(--mui-icon-font, 'Material Icons')
-        --mui-left-input-padding__: var(--mui-left-input-padding, 1em)
-        --mui-right-input-padding__: var(--mui-right-input-padding, 1em)
+        --mui-affix-gap__: var(--mui-affix-gap, 0em)
 
         height: 3rem
         background: var(--mui-background__)
@@ -452,7 +475,7 @@
                 border-color: var(--mui-focused-border-color__)
 
         &.filled
-            .input-wrapper
+            .input-wrapper .inner-input-wrapper .input-compactor
                 .placeholder
                     opacity: 0
 
@@ -462,28 +485,25 @@
 
             .input-wrapper
                 .label
-                    transform: translate(2px, -5px) scale(0.72)
+                    transform: translate(0, -5px) scale(0.72)
 
         &.has-label
             .input-wrapper
-                .input
-                    padding-top: 1em !important
-
-                .placeholder
+                .inner-input-wrapper
                     padding-top: 1em !important
 
             &:not(.focused)
-                .placeholder
+                .input-wrapper .inner-input-wrapper .input-compactor .placeholder
                     opacity: 0
+
+            &:not(.focused):not(.filled)
+                .input-wrapper .inner-input-wrapper
+                    .prefix,
+                    .suffix
+                        opacity: 0
 
         &.bottom-bar-space
             margin-bottom: 1.3em
-
-        &.left-slot-space
-            --mui-left-input-padding__: 0px
-
-        &.right-slot-space
-            --mui-right-input-padding__: 0px
 
         &.disabled
             background: var(--mui-disabled-background__)
@@ -492,16 +512,19 @@
                 border-color: var(--mui-disabled-border-color__)
 
         &.input-type-password:not(.obfuscated)
-            .slot-button
-                .obfuscation-cross
-                    transform: rotate(45deg) scaleY(1) !important
+            .side-wrapper
+                .side-button
+                    .obfuscation-cross
+                        clip-path: inset(0 0 0 0)
 
         &.invalid
             .border
                 border-color: var(--mui-invalid-border-color__)
 
-            .slot-wrapper
-                color: var(--mui-invalid-color__)
+            .box-wrapper
+                .side-wrapper
+                    .side-icon
+                        color: var(--mui-invalid-color__)
 
             .bottom-bar
                 .max-text,
@@ -511,25 +534,39 @@
         &.input-type-textarea
             height: auto
 
+            &.input-resize-vertical .box-wrapper
+                resize: vertical !important
+            
+            &.input-resize-horizontal .box-wrapper
+                resize: horizontal !important
+
+            &.input-resize-both .box-wrapper
+                resize: both !important
+
             .box-wrapper
                 height: var(--base-height)
                 min-height: 2em
-                resize: vertical
+                resize: none
                 overflow: hidden
                 align-items: flex-start
                 
-                .slot-wrapper
-                    aspect-ratio: unset
-                    width: 3em
-                    height: 3em
+                .side-wrapper
+                    max-height: 3em
 
                 .input-wrapper
-                    .label, .placeholder
+                    .label
                         height: 3em
 
-                    .input
-                        margin-top: 1em
-                        height: calc(100% - 1em)
+                    .inner-input-wrapper
+                        padding-top: .75em
+
+                        .input-compactor
+                            .placeholder
+                                height: auto
+
+                            .input
+                                height: calc(100% - .1em)
+                                margin-top: .1em
 
         &.input-type-textarea.has-label
             .box-wrapper
@@ -537,10 +574,8 @@
                     .label
                         height: 3em
 
-                    .input
-                        margin-top: 1.4em
-                        height: calc(100% - 1.4em)
-                        padding-top: 0 !important
+                    .inner-input-wrapper
+                        padding-top: 1.2em !important
 
 
 
@@ -553,57 +588,78 @@
             display: flex
             align-items: center
 
-        .slot-wrapper
-            aspect-ratio: 1
-            height: 100%
-            flex: none
-            display: flex
-            padding: 0
-            margin: 0
-            align-items: center
-            justify-content: center
-            color: var(--mui-color-light__)
+            .side-wrapper
+                padding: 0 .5em
+                display: flex
+                align-items: center
+                height: 100%
 
-            &.slot-button
-                border: none
-                background: transparent
-                border-radius: inherit
-                font-family: inherit
-                font-size: inherit
-                position: relative
-                transition: all 100ms
-                cursor: pointer
-
-                &:disabled
-                    cursor: initial
-
-                &.hide-button
-                    opacity: 0
-                    transform: scale(.5)
-                    cursor: initial
+                .side-icon
+                    height: 2em
+                    width: 2em
+                    display: flex
+                    align-items: center
+                    justify-content: center
+                    flex: none
+                    font-family: var(--mui-icon-font__)
+                    color: inherit
                     user-select: none
-                    pointer-events: none
+                    color: var(--mui-color-light__)
 
-                .obfuscation-cross
-                    content: ''
-                    width: 0
-                    height: 60%
-                    position: absolute
-                    right: 23%
-                    top: 29%
-                    z-index: 1
-                    transition: all 160ms
-                    transform: rotate(45deg) scaleY(0)
-                    transform-origin: center top
-                    background: var(--mui-background__)
-                    border-left: 2px solid currentColor
-                    border-right: 2px solid var(--mui-background__)
+                    > span
+                        font-size: 1.25em
+                    
+                .side-button
+                    height: 2em
+                    width: 2em
+                    display: flex
+                    align-items: center
+                    justify-content: center
+                    flex: none
+                    border: none
+                    padding: 0
+                    margin: 0
+                    border-radius: .25em
+                    background: transparent
+                    color: var(--mui-color-light__)
+                    font-family: inherit
+                    font-size: inherit
+                    position: relative
+                    transition: all 100ms
+                    cursor: pointer
 
-            .icon
-                font-family: var(--mui-icon-font__)
-                font-size: 1.25em
-                color: inherit
-                user-select: none
+                    &:hover
+                        background: var(--mui-background-secondary__)
+                        color: var(--mui-color__)
+
+                    &:focus
+                        background: var(--mui-background-secondary__)
+                        color: var(--mui-color__)
+                        outline: none
+
+                    &:disabled
+                        cursor: initial
+
+                    &.hide-button
+                        opacity: 0
+                        cursor: initial
+                        user-select: none
+                        pointer-events: none
+
+                    .obfuscation-cross
+                        content: ''
+                        width: 0
+                        height: 60%
+                        position: absolute
+                        left: 50%
+                        top: calc(20% + 1px)
+                        z-index: 1
+                        transition: clip-path 160ms, border 100ms, background 100ms
+                        transform: rotate(45deg) translateX(-50%)
+                        background: var(--mui-background__)
+                        border-left: 2px solid currentColor
+                        border-right: 1px solid var(--mui-background__)
+                        clip-path: inset(0 0 100% 0)
 
         .input-wrapper
             display: flex
@@ -613,42 +669,83 @@
             width: 100%
             position: relative
 
-            .input
-                height: 100%
-                width: 100%
+            .inner-input-wrapper
                 flex: 1
-                padding-block: 0
-                padding-left: var(--mui-left-input-padding__)
-                padding-right: var(--mui-right-input-padding__)
-                border: none
-                background: none
-                border-radius: inherit
-                font-family: inherit
-                font-size: inherit
-                resize: none
-                color: var(--mui-color__)
+                display: flex
+                align-items: center
+                height: 100%
+                gap: var(--mui-affix-gap__)
 
-                // Disable number arrows
-                &[type="number"]
-                    -moz-appearance: textfield
+                .prefix,
+                .suffix
+                    user-select: none
+                    pointer-events: none
+                    transition: opacity 160ms
+                    color: var(--mui-color-light__)
 
-                &[type="password"]::-ms-reveal,
-                &[type="password"]::-ms-clear
-                    display: none
+                .input-compactor
+                    flex: 1
+                    position: relative
+                    height: 100%
 
-                &[type="search"]::-webkit-search-decoration,
-                &[type="search"]::-webkit-search-cancel-button,
-                &[type="search"]::-webkit-search-results-button,
-                &[type="search"]::-webkit-search-results-decoration
-                    display: none
+                    .input
+                        height: 100%
+                        width: 100%
+                        flex: 1
+                        padding: 0
+                        border: none
+                        background: none
+                        border-radius: inherit
+                        font-family: inherit
+                        font-size: inherit
+                        resize: none
+                        color: var(--mui-color__)
 
-                &:focus
-                    outline: none
+                        // Disable number arrows
+                        &[type="number"]
+                            -moz-appearance: textfield
 
-                &::-webkit-outer-spin-button,
-                &::-webkit-inner-spin-button
-                    -webkit-appearance: none
-                    margin: 0
+                        &[type="password"]::-ms-reveal,
+                        &[type="password"]::-ms-clear
+                            display: none
+
+                        &[type="search"]::-webkit-search-decoration,
+                        &[type="search"]::-webkit-search-cancel-button,
+                        &[type="search"]::-webkit-search-results-button,
+                        &[type="search"]::-webkit-search-results-decoration
+                            display: none
+
+                        &:focus
+                            outline: none
+
+                        &::-webkit-outer-spin-button,
+                        &::-webkit-inner-spin-button
+                            -webkit-appearance: none
+                            margin: 0
+
+                    .placeholder
+                        font-size: inherit
+                        height: 100%
+                        width: 100%
+                        line-height: 1.5
+                        position: absolute
+                        top: 0
+                        left: 0
+                        display: flex
+                        align-items: center
+                        padding-block: 0
+                        padding-left: var(--mui-left-input-padding__)
+                        padding-right: var(--mui-right-input-padding__)
+                        white-space: nowrap
+                        overflow: hidden
+                        text-overflow: ellipsis
+                        text-align: left
+                        pointer-events: none
+                        transition: opacity 160ms
+                        color: var(--mui-color-light__)
+                        transform-origin: top left
+                        user-select: none
+                        opacity: .8
 
             .label
                 font-size: inherit
@@ -672,30 +769,6 @@
                 color: var(--mui-color-light__)
                 transform-origin: top left
                 user-select: none
-
-            .placeholder
-                font-size: inherit
-                height: 100%
-                width: 100%
-                line-height: 1.5
-                position: absolute
-                top: 0
-                left: 0
-                display: flex
-                align-items: center
-                padding-block: 0
-                padding-left: var(--mui-left-input-padding__)
-                padding-right: var(--mui-right-input-padding__)
-                white-space: nowrap
-                overflow: hidden
-                text-overflow: ellipsis
-                text-align: left
-                pointer-events: none
-                transition: all 200ms
-                color: var(--mui-color-light__)
-                transform-origin: top left
-                user-select: none
-                opacity: .8
 
         .border
             height: 100%
@@ -743,12 +816,11 @@
 
         .progress-bar
             height: 3px
-            border-radius: .5rem .5rem 0 0
-            background: #00000010
-            width: calc(100% - 2em)
+            background: var(--mui-background-secondary__)
+            width: 100%
             position: absolute
             bottom: 0
-            left: 1em
+            left: 0
             z-index: 1
             pointer-events: none
             transform: scaleY(0)
@@ -766,11 +838,11 @@
 
                 &.score-0
                     width: 5%
-                    background: #eb3b5a
+                    background: var(--mui-invalid-color__)
 
                 &.score-1
                     width: 25%
-                    background: #ee5253
+                    background: var(--mui-invalid-color__)
 
                 &.score-2
                     width: 50%

@@ -63,6 +63,9 @@ Minimal setup
 | errorText | `String` | `''` | *Description coming soon* |
 | title | `String` | `''` | *Description coming soon* |
 | name | `String` | `''` | *Description coming soon* |
+| prefix | `String` | `''` | *Description coming soon* |
+| suffix | `String` | `''` | *Description coming soon* |
+| resize | `String` | `'none'` | Valid value: `none`, `horizontal`, `vertical`, `both` *Only available for the input type:* `textarea` |
 | hideMax | `Boolean` | `false` | *Description coming soon* |
 | clearable | `Boolean` | `false` | *Description coming soon* |
 | hideObfuscationToggle | `Boolean` | `false` | Toggles obfuscation of password. *Only available for the input type:* `password` |
