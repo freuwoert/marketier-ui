@@ -466,6 +466,7 @@
         --mui-affix-gap__: var(--mui-affix-gap, 0em)
 
         height: 3rem
+        display: flex
         background: var(--mui-background__)
         border-radius: .325em
         position: relative
@@ -813,6 +814,7 @@
                 overflow: hidden
                 text-overflow: ellipsis
                 justify-self: flex-end
+                margin-left: auto
 
         .progress-bar
             height: 3px
