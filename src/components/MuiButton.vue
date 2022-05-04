@@ -288,6 +288,7 @@
             width: 1.25em
             top: calc(50% - .625em)
             left: calc(50% - .625em)
+            pointer-events: none
 
         .border
             height: 100%
