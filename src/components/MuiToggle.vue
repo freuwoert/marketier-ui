@@ -1,24 +1,34 @@
 <template>
-    <div class="mui-container" @click.stop="toggle()">
-        <div class="box" :class="{'active': value_}">
+    <label class="mui-container" :class="classes__">
+        <input class="input" type="checkbox" v-if="dataType__ === 'boolean'" @click="toggle()" :name="name" :value="value__" :checked="internalValue__">
+        <input class="input" type="hidden" v-else @click="toggle()" :name="name" :value="value__">
+        
+        <div class="label" v-if="$slots.leftLabel">
+            <slot name="leftLabel"></slot>
+        </div>
+        
+        <div class="box">
             <svg class="checkmark" viewBox="0 0 24 24">
                 <path fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="blue" d="M3,12l6,6l12,-12"/>
             </svg>
-            <div class="checkmark" v-show="value_"></div>
-            <input class="input" type="checkbox" :name="name" :value="value_" :checked="value_">
         </div>
 
-        <div class="label" v-if="$slots.default">
-            <slot></slot>
+        <div class="label" v-if="$slots.rightLabel">
+            <slot name="rightLabel"></slot>
         </div>
 
-        <div class="border" v-if="hasBorder && $slots.default"></div>
-    </div>
+        <div class="border" v-if="hasBorder__"></div>
+    </label>
 </template>
 
 <script>
     export default {
         props: {
+            modelValue: {
+                type: [Boolean, String, Number],
+                default: false,
+            },
+
             type: {
                 type: String,
                 default: 'checkbox',
@@ -29,12 +39,12 @@
                 default: '',
             },
 
-            value: {
+            prependValue: {
                 type: [Boolean, String, Number],
                 default: false,
             },
             
-            alternateValue: {
+            appendValue: {
                 type: [Boolean, String, Number],
                 default: true,
             },
@@ -49,32 +59,60 @@
                 default: false,
             },
         },
+
         data() {
             return {
-                value_: false,
-                hasBorder: true,
+                internalValue__: false,
             }
         },
-        mounted() {
-            if (typeof this.noBorder !== 'undefined') this.hasBorder = false
-            
-            if( this.value === true || this.value === false )
-            {
-                this.value_ = this.value
-            }
-        },
+
         watch: {
-            value() {
-                if( this.value === true || this.value === false )
-                {
-                    this.value_ = this.value
-                }
-            }
+            modelValue: {
+                immediate: true,
+                handler(newValue) {
+                    this.internalValue__ = this.parseValue(newValue)
+                },
+            },
         },
+
+        computed: {
+            value__() {
+                return this.internalValue__ ? this.appendValue : this.prependValue
+            },
+
+            classes__() {
+                return {
+                    'active': this.internalValue__,
+                }
+            },
+
+            type__() {
+                return ['checkbox', 'switch'].includes(this.type) ? this.type : 'checkbox'
+            },
+
+            dataType__() {
+                return typeof this.prependValue !== 'boolean' || typeof this.appendValue !== 'boolean' ? 'string' : 'boolean'
+            },
+
+            hasBorder__() {
+                return (this.$slots.leftLabel || this.$slots.rightLabel) && !this.noBorder
+            },
+        },
+
         methods: {
+            parseValue(value) {
+                if (value === this.prependValue) return false
+
+                if (value === this.appendValue) return true
+                
+                if (typeof value === 'boolean') return value
+
+                return false
+            },
+
             toggle() {
-                this.value_ = !this.value_
-                this.$emit('input', this.value_)
+                this.internalValue__ = !this.internalValue__
+                this.$emit('update:modelValue', this.value__)
             },
         }
     }
@@ -90,6 +128,14 @@
         padding: 0.6875rem
         cursor: pointer
 
+        &.active
+            .box
+                background: var(--mui-background)
+                border-color: var(--mui-background)
+
+                .checkmark
+                    color: white
+
         .box
             height: 1.25rem
             width: 1.25rem
@@ -97,13 +143,6 @@
             border-radius: 0.25rem
             position: relative
             user-select: none
-            
-            &.active
-                background: var(--primary)
-                border-color: var(--primary)
-
-                .checkmark
-                    color: white
 
             .checkmark
                 height: 100%
@@ -114,8 +153,8 @@
                 text-align: center
                 color: #666
 
-            .input
-                display: none
+        .input
+            display: none
         
         .label
             font-size: 0.875rem
