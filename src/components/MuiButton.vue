@@ -1,14 +1,16 @@
 <template>
     <button class="mui-container"
+        role="button"
         :type="type__"
         :disabled="disabled"
         :area-disabled="disabled"
+        :aria-label="label"
         :class="classes__"
         @click="click()">
 
         <div class="icon" v-if="iconLeft">{{iconLeft}}</div>
         <span class="content">
-            <slot></slot>
+            <slot>{{label}}</slot>
         </span>
         <div class="icon" v-if="iconRight">{{iconRight}}</div>
 
@@ -38,6 +40,11 @@
             color: {
                 type: String,
                 default: 'primary',
+            },
+
+            label: {
+                type: String,
+                default: '',
             },
 
             iconLeft: {
@@ -100,7 +107,7 @@
             },
 
             presetColor__() {
-                return ['primary', 'secondary', 'success', 'info', 'warning', 'error'].includes(this.color) ? this.color : 'custom'
+                return ['primary', 'secondary', 'success', 'info', 'warning', 'error'].includes(this.color) ? this.color : 'primary'
             },
         },
 
@@ -124,8 +131,8 @@
     .mui-container
         font-size: 1rem
 
-        --mui-background__: var(--mui-background, #650db4)
-        --mui-color__: var(--mui-color, #fff)
+        --mui-background__: var(--primary, #650db4)
+        --mui-color__: var(--primary-contrast, #fff)
 
         --mui-disabled-background__: var(--mui-disabled-background, #f0f0f0)
         --mui-disabled-color__: var(--mui-disabled-color, #777)

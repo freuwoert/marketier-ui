@@ -1,24 +1,58 @@
 <template>
-    <label class="mui-container" :class="classes__">
-        <input class="input" type="checkbox" v-if="dataType__ === 'boolean'" @click="toggle()" :name="name" :value="value__" :checked="internalValue__">
-        <input class="input" type="hidden" v-else @click="toggle()" :name="name" :value="value__">
+    <div class="mui-container"
+        :class="classes__"
+        :tabindex="tabindex__"
+        :role="type__"
+        :aria-checked="internalValue__"
+        :disabled="disabled"
+        :aria-disabled="disabled"
+        @click="inputEvent('input', $event); toggle($event)"
+        @focus="inputEvent('focus', $event)"
+        @blur="inputEvent('blur', $event)"
+        @keydown="inputEvent('keydown', $event)"
+        @keyup="inputEvent('keyup', $event)"
+        @keypress="inputEvent('keypress', $event)"
+        @keydown.esc="inputEvent('esc', $event)"
+        @keydown.space.prevent="inputEvent('space', $event); toggle($event)"
+        @keydown.enter="inputEvent('enter', $event)">
+
+        <input class="input"
+            readonly
+            :name="name"
+            :value="value__"
+            :checked="internalValue__"
+            :disabled="disabled"
+            :required="required"
+            :type="dataType__ === 'boolean' ? 'checkbox' : 'hidden'">
         
-        <div class="label" v-if="$slots.leftLabel">
-            <slot name="leftLabel"></slot>
+        <div class="label" v-if="$slots.prependLabel || prependLabel">
+            <slot name="prependLabel">{{prependLabel}}</slot>
         </div>
         
-        <div class="box">
-            <svg class="checkmark" viewBox="0 0 24 24">
-                <path fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="blue" d="M3,12l6,6l12,-12"/>
-            </svg>
+        <div class="checkbox-wrapper" v-if="type__ === 'checkbox'">
+            <div class="focus-indicator"></div>
+            <div class="checkbox">
+                <transition name="checked">
+                    <svg class="checkmark" viewBox="0 0 24 24" v-show="internalValue__" :style="`--mui-stroke-offset__: ${checkmarkPathLength__}`">
+                        <path ref="checkmarkPath" d="M3,12l6,6l12,-12"/>
+                    </svg>
+                </transition>
+            </div>
         </div>
 
-        <div class="label" v-if="$slots.rightLabel">
-            <slot name="rightLabel"></slot>
+        <div class="switchbox" v-else-if="type__ === 'switch'">
+            <div class="switchdot-wrapper">
+                <div class="focus-indicator"></div>
+                <div class="switchdot"></div>
+            </div>
+        </div>
+
+        <div class="label" v-if="$slots.appendLabel || appendLabel">
+            <slot name="appendLabel">{{appendLabel}}</slot>
         </div>
 
         <div class="border" v-if="hasBorder__"></div>
-    </label>
+    </div>
 </template>
 
 <script>
@@ -26,7 +60,7 @@
         props: {
             modelValue: {
                 type: [Boolean, String, Number],
-                default: false,
+                default: null,
             },
 
             type: {
@@ -34,7 +68,27 @@
                 default: 'checkbox',
             },
 
-            label: {
+            name: {
+                type: String,
+                default: '',
+            },
+
+            disabled: {
+                type: Boolean,
+                default: false,
+            },
+
+            required: {
+                type: Boolean,
+                default: false,
+            },
+
+            tabindex: {
+                type: [Number, String],
+                default: 0,
+            },
+
+            prependLabel: {
                 type: String,
                 default: '',
             },
@@ -43,15 +97,15 @@
                 type: [Boolean, String, Number],
                 default: false,
             },
+
+            appendLabel: {
+                type: String,
+                default: '',
+            },
             
             appendValue: {
                 type: [Boolean, String, Number],
                 default: true,
-            },
-
-            name: {
-                type: String,
-                default: '',
             },
 
             noBorder: {
@@ -62,8 +116,14 @@
 
         data() {
             return {
+                focus__: false,
                 internalValue__: false,
+                checkmarkPathLength__: 0,
             }
+        },
+
+        mounted() {
+            this.checkmarkPathLength__ = this.$refs?.checkmarkPath?.getTotalLength() || 0
         },
 
         watch: {
@@ -83,6 +143,7 @@
             classes__() {
                 return {
                     'active': this.internalValue__,
+                    'disabled': this.disabled,
                 }
             },
 
@@ -90,12 +151,16 @@
                 return ['checkbox', 'switch'].includes(this.type) ? this.type : 'checkbox'
             },
 
+            tabindex__() {
+                return this.disabled ? -1 : Number(this.tabindex)
+            },
+
             dataType__() {
                 return typeof this.prependValue !== 'boolean' || typeof this.appendValue !== 'boolean' ? 'string' : 'boolean'
             },
 
             hasBorder__() {
-                return (this.$slots.leftLabel || this.$slots.rightLabel) && !this.noBorder
+                return (this.$slots.prependLabel || this.$slots.appendLabel || this.prependLabel || this.appendLabel) && !this.noBorder
             },
         },
 
@@ -110,39 +175,149 @@
                 return false
             },
 
-            toggle() {
+            toggle(event) {
+                if (this.shouldBounceEvent(event)) return
+
                 this.internalValue__ = !this.internalValue__
                 this.$emit('update:modelValue', this.value__)
+            },
+
+            inputEvent(type, event) {
+                this.$emit(type, event)
+
+                switch (type)
+                {
+                    case 'focus': this.focus__ = true; break;
+                    case 'blur': this.focus__ = false; break;
+                }
+            },
+
+            shouldBounceEvent(event) {
+                if (this.disabled) return true
+
+                for (const element of event.path)
+                {
+                    // Only go through child elements
+                    if (element === this.$el) return false
+
+                    // Bounce event for all elements with the "mui-container" class
+                    if ([...element.classList].includes('mui-container')) return true
+
+                    // Bounce event for interactive elements
+                    if (['A', 'BUTTON', 'INPUT', 'TEXTAREA'].includes(element.tagName)) return true
+                }
+
+                return false
             },
         }
     }
 </script>
 
 <style lang="sass" scoped>
+    *
+        box-sizing: border-box
+
     .mui-container
+        font-size: 1rem
+        --mui-border-color__: var(--mui-border-color, #888)
+        
+        --mui-background__: var(--mui-background, #fff)
+        --mui-color__: var(--mui-color-light, #666)
+
+        --mui-active-background__: var(--primary, #650db4)
+        --mui-active-color__: var(--primary-contrast, #fff)
+
+        --mui-disabled-background__: var(--mui-disabled-background, #f0f0f0)
+        --mui-disabled-color__: var(--mui-disabled-color, #777)
+
         position: relative
         vertical-align: top
         display: inline-flex
         align-items: center
-        gap: 0.6875rem
-        padding: 0.6875rem
+        justify-content: center
+        gap: 1em
+        padding-inline: 0.625em
+        padding-block: .5em
+        min-height: 2.5em
         cursor: pointer
+        user-select: none
+        border-radius: .325em
 
         &.active
-            .box
-                background: var(--mui-background)
-                border-color: var(--mui-background)
+            --mui-background__: var(--mui-active-background__, #650db4)
+            --mui-color__: var(--mui-active-color__, #fff)
 
-                .checkmark
-                    color: white
+            .checkbox
+                background: var(--mui-background__)
+                border-color: var(--mui-background__)
+                color: var(--mui-color__)
 
-        .box
-            height: 1.25rem
-            width: 1.25rem
-            border: 2px solid #666
-            border-radius: 0.25rem
+            .switchbox
+                border-color: var(--mui-background__)
+                background: var(--mui-background__)
+                color: var(--mui-color__)
+
+                .switchdot-wrapper
+                    left: calc(100% - 1.25em + 4px)
+
+
+
+        &:hover:not(.disabled)
+            .focus-indicator
+                opacity: .1
+                transform: translate(-50%, -50%) scale(1)
+
+
+
+        &:focus:not(.disabled)
+            outline: none
+            
+            .focus-indicator
+                opacity: .2
+                transform: translate(-50%, -50%) scale(1)
+
+
+
+        &.disabled
+            pointer-events: none
+            cursor: initial
+            --mui-background__: var(--mui-disabled-background__)
+            --mui-color__: var(--mui-disabled-color__)
+
+            .checkbox
+                border-color: var(--mui-color__)
+                background: var(--mui-background__)
+                color: var(--mui-color__)
+
+            .switchbox
+                border-color: var(--mui-color__)
+                background: var(--mui-color__)
+                color: var(--mui-background__)
+
+
+
+        .checkbox-wrapper
+            height: 1.25em
+            width: 1.25em
+            display: flex
+            align-items: center
+            justify-content: center
+            flex: none
             position: relative
+
+        .checkbox
+            height: 100%
+            width: 100%
+            border-radius: 0.25em
+            position: relative
+            z-index: 1
             user-select: none
+            border: 2px solid transparent
+            transition: all 50ms ease-in-out
+
+            border-color: var(--mui-color__)
+            background: var(--mui-background__)
+            color: var(--mui-color__)
 
             .checkmark
                 height: 100%
@@ -151,16 +326,71 @@
                 top: 0
                 left: 0
                 text-align: center
-                color: #666
+                color: inherit
+                transition: stroke-dashoffset 80ms cubic-bezier(0.80, 0, 0.2, 1)
+                stroke-dasharray: var(--mui-stroke-offset__)
+                stroke-dashoffset: 0
+                fill: none
+                stroke-width: 2.4
+                stroke: currentColor
+                stroke-linecap: round
+                stroke-linejoin: round
+
+                &.checked-enter-active
+                    stroke-dashoffset: var(--mui-stroke-offset__)
+
+                &.checked-leave-to
+                    stroke-dashoffset: calc(-1 * var(--mui-stroke-offset__))
+
+        .switchbox
+            height: 1.25em
+            width: 2.25em
+            border-radius: 1em
+            border: 2px solid transparent
+            transition: all 50ms ease-in-out
+
+            border-color: var(--mui-color__)
+            background: var(--mui-color__)
+            color: var(--mui-background__)
+
+            .switchdot-wrapper
+                height: calc(1.25em - 4px)
+                aspect-ratio: 1
+                transition: all 80ms cubic-bezier(0.80, 0, 0.2, 1)
+                position: absolute
+                top: 0
+                left: 0
+                pointer-events: none
+
+                .switchdot
+                    height: 100%
+                    width: 100%
+                    border-radius: 50%
+                    position: relative
+                    z-index: 1
+                    background: currentColor
+
+        .focus-indicator
+            height: 2.25em
+            width: 2.25em
+            border-radius: 50%
+            position: absolute
+            top: 50%
+            left: 50%
+            transform: translate(-50%, -50%) scale(.6)
+            transition: all 100ms ease-in-out
+            background: var(--mui-active-background__)
+            opacity: 0
+            pointer-events: none
 
         .input
             display: none
         
         .label
-            font-size: 0.875rem
-            line-height: 1.125rem
+            font-size: 0.8em
+            line-height: 1.25
             user-select: none
-            flex: 1
+            flex: none
 
         .border
             height: 100%
@@ -168,7 +398,7 @@
             position: absolute
             top: 0
             left: 0
-            border-radius: .325rem
-            border: var(--input-border)
+            border-radius: inherit
+            border: 1px solid var(--mui-border-color__)
             pointer-events: none
 </style>
