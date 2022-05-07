@@ -45,7 +45,7 @@ Minimal setup
 ### Parameters
 | Parameters | Type | Default | Description |
 |--|--|--|--|
-| type | `String` | `text` | Input type. Available types: `text`, `password`, `number`, `url`, `email`, `tel`, `search`|
+| type | `String` | `text` | Input type. Available types: `text`, `password`, `number`, `url`, `email`, `tel`, `search`, `textarea`|
 | label | `String` | `''` | Label of the input; *go-to parameter to indicate the use of the input.* |
 | placeholder | `String` | `''` | Placeholder of the input; *like a label but it doesn't make way for the entered value - it fades instead.* |
 | helper | `String` | `''` | Helper text displayed underneath the input |
