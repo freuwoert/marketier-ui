@@ -1,7 +1,7 @@
 {
     "name": "marketier-ui",
     "description": "A material-like input-component library for Vue 3",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "main": "./dist/marketier-ui.umd.js",
     "module": "./dist/marketier-ui.es.js",
     "exports": {
