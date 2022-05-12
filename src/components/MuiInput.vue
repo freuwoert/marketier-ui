@@ -21,6 +21,7 @@
                             :spellcheck="spellcheck"
                             :disabled="disabled"
                             :required="required"
+                            :readonly="readonly__"
                             :tabindex="tabindex__"
                             :name="name"
                             :title="computedTitle__"
@@ -48,6 +49,7 @@
                             :spellcheck="spellcheck"
                             :disabled="disabled"
                             :required="required"
+                            :readonly="readonly__"
                             :tabindex="tabindex__"
                             :name="name"
                             :title="computedTitle__"
@@ -88,6 +90,10 @@
                     <visibility-icon />
                 </button>
 
+                <div class="side-icon" v-if="type__ === 'select'">
+                    <dropdown-arrow-icon />
+                </div>
+
                 <div class="side-icon" v-if="iconRight__"><span>{{iconRight__}}</span></div>
                 <slot class="side-slot" v-if="$slots.right" name="right"></slot>
             </div>
@@ -95,6 +101,14 @@
             <div class="progress-bar" v-if="hasScore__">
                 <div class="progress" :class="'score-'+score__"></div>
             </div>
+        </div>
+
+        <div class="select-bar">
+            <slot v-for="item in items__" :key="item" :data="item" :value="item.value" :label="item.label">
+                <button type="button" class="select-item" @click="value__ = item.value">
+                    <div class="select-item-label">{{item.label}}</div>
+                </button>
+            </slot>
         </div>
 
         <div class="bottom-bar" v-if="hasBottomBar__">
@@ -108,12 +122,18 @@
 <script>
     import CloseIcon from '@/components/icons/Close.vue'
     import VisibilityIcon from '@/components/icons/Visibility.vue'
+    import DropdownArrowIcon from '@/components/icons/DropdownArrow.vue'
 
     export default {
         props: {
             modelValue: {
                 type: [String, Number],
                 default: '',
+            },
+
+            items: {
+                type: Array,
+                default: () => [],
             },
 
             type: {
@@ -177,6 +197,11 @@
             },
 
             disabled: {
+                type: Boolean,
+                default: false,
+            },
+
+            readonly: {
                 type: Boolean,
                 default: false,
             },
@@ -257,7 +282,7 @@
 
         computed: {
             type__() {
-                return ['text', 'email', 'number', 'url', 'password', 'search', 'tel', 'textarea'].includes(this.type) ? this.type : 'text'
+                return ['text', 'email', 'number', 'url', 'password', 'search', 'tel', 'textarea', 'select'].includes(this.type) ? this.type : 'text'
             },
 
             computedType__() {
@@ -266,12 +291,33 @@
                 return this.type__
             },
 
+            items__() {
+                let items = []
+
+                if (!Array.isArray(this.items)) return items
+
+                for (const item of this.items)
+                {
+                    if (typeof item === 'object' && item.value && item.label) items.push(item)
+                    
+                    else if (['string', 'number', 'boolean'].includes(typeof item)) items.push({ value: item, label: item })
+
+                    else continue
+                }
+                
+                return items
+            },
+
             computedTitle__() {
                 return this.title || (this.errorText && !this.valid__) ? this.errorText : ''
             },
 
             resize__() {
                 return ['none', 'vertical', 'horizontal', 'both'].includes(this.resize) ? this.resize : 'none'
+            },
+
+            readonly__() {
+                return this.readonly || this.type__ === 'select'
             },
 
             helperText__() {
@@ -437,6 +483,7 @@
         components: {
             CloseIcon,
             VisibilityIcon,
+            DropdownArrowIcon,
         },
     }
 </script>
@@ -481,8 +528,9 @@
                     opacity: 0
 
         &.focused-or-filled
-            .progress-bar
-                transform: scaleY(1)
+            .box-wrapper
+                .progress-bar
+                    transform: scaleY(1)
 
             .input-wrapper
                 .label
@@ -662,6 +710,48 @@
                         border-right: 1px solid var(--mui-background__)
                         clip-path: inset(0 0 100% 0)
 
+            .progress-bar
+                height: 3px
+                background: var(--mui-background-secondary__)
+                width: 100%
+                position: absolute
+                bottom: 0
+                left: 0
+                z-index: 1
+                pointer-events: none
+                transform: scaleY(0)
+                transform-origin: center bottom
+                text-align: left
+                transition: all 200ms
+                overflow: hidden
+
+                .progress
+                    height: 100%
+                    transition: all 300ms
+                    position: absolute
+                    top: 0
+                    left: 0
+
+                    &.score-0
+                        width: 5%
+                        background: var(--mui-invalid-color__)
+
+                    &.score-1
+                        width: 25%
+                        background: var(--mui-invalid-color__)
+
+                    &.score-2
+                        width: 50%
+                        background: #ff9f43
+
+                    &.score-3
+                        width: 75%
+                        background: #f1c40f
+
+                    &.score-4
+                        width: 100%
+                        background: #2ecc71
+
         .input-wrapper
             display: flex
             flex: 1
@@ -784,6 +874,17 @@
             border-color: var(--mui-border-color__)
             pointer-events: none
 
+        .select-bar
+            width: 100%
+            padding: .5rem 0
+            background: var(--mui-background__)
+            position: absolute
+            top: 100%
+            left: 0
+            z-index: 3
+            border-radius: .325rem
+            box-shadow: 0 0 .5rem rgba(0, 0, 0, .1)
+
         .bottom-bar
             height: 1.3em
             width: 100%
@@ -815,46 +916,4 @@
                 text-overflow: ellipsis
                 justify-self: flex-end
                 margin-left: auto
-
-        .progress-bar
-            height: 3px
-            background: var(--mui-background-secondary__)
-            width: 100%
-            position: absolute
-            bottom: 0
-            left: 0
-            z-index: 1
-            pointer-events: none
-            transform: scaleY(0)
-            transform-origin: center bottom
-            text-align: left
-            transition: all 200ms
-            overflow: hidden
-
-            .progress
-                height: 100%
-                transition: all 300ms
-                position: absolute
-                top: 0
-                left: 0
-
-                &.score-0
-                    width: 5%
-                    background: var(--mui-invalid-color__)
-
-                &.score-1
-                    width: 25%
-                    background: var(--mui-invalid-color__)
-
-                &.score-2
-                    width: 50%
-                    background: #ff9f43
-
-                &.score-3
-                    width: 75%
-                    background: #f1c40f
-
-                &.score-4
-                    width: 100%
-                    background: #2ecc71
 </style>
