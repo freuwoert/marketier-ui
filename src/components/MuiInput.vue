@@ -1,6 +1,6 @@
 <template>
     <label class="mui-container" :class="classes__">
-        <div class="box-wrapper">
+        <div class="box-wrapper" @click="openSelect()">
             <div class="border" v-if="!noBorder"></div>
 
             <div class="side-wrapper">
@@ -15,35 +15,7 @@
                     <span class="prefix" v-if="prefix">{{prefix}}</span>
 
                     <div class="input-compactor">
-                        <textarea v-if="type__ === 'textarea'" ref="input" class="input"
-                            :pattern="pattern"
-                            :autocomplete="autocomplete"
-                            :spellcheck="spellcheck"
-                            :disabled="disabled"
-                            :required="required"
-                            :readonly="readonly__"
-                            :tabindex="tabindex__"
-                            :name="name"
-                            :title="computedTitle__"
-                            :minlength="min__"
-                            :maxlength="max__"
-                            v-model="value__"
-                            :aria-required="required"
-                            :aria-label="label"
-                            :aria-disabled="disabled"
-                            @input="input($event.target.value)"
-                            @focus="inputEvent('focus', $event)"
-                            @blur="inputEvent('blur', $event)"
-                            @keydown="inputEvent('keydown', $event)"
-                            @keyup="inputEvent('keyup', $event)"
-                            @keypress="inputEvent('keypress', $event)"
-                            @change="inputEvent('change', $event)"
-                            @keydown.esc="inputEvent('esc', $event)"
-                            @keydown.enter="inputEvent('enter', $event)"
-                            >
-                        </textarea>
-
-                        <input v-else ref="input" class="input"
+                        <input v-if="type__ !== 'textarea'" ref="input" class="input"
                             :pattern="pattern"
                             :autocomplete="autocomplete"
                             :spellcheck="spellcheck"
@@ -71,7 +43,37 @@
                             @change="inputEvent('change', $event)"
                             @keydown.esc="inputEvent('esc', $event)"
                             @keydown.enter="inputEvent('enter', $event)"
+                            @keydown.space="inputEvent('space', $event)"
                             >
+
+                        <textarea v-else ref="input" class="input"
+                            :pattern="pattern"
+                            :autocomplete="autocomplete"
+                            :spellcheck="spellcheck"
+                            :disabled="disabled"
+                            :required="required"
+                            :readonly="readonly__"
+                            :tabindex="tabindex__"
+                            :name="name"
+                            :title="computedTitle__"
+                            :minlength="min__"
+                            :maxlength="max__"
+                            v-model="value__"
+                            :aria-required="required"
+                            :aria-label="label"
+                            :aria-disabled="disabled"
+                            @input="input($event.target.value)"
+                            @focus="inputEvent('focus', $event)"
+                            @blur="inputEvent('blur', $event)"
+                            @keydown="inputEvent('keydown', $event)"
+                            @keyup="inputEvent('keyup', $event)"
+                            @keypress="inputEvent('keypress', $event)"
+                            @change="inputEvent('change', $event)"
+                            @keydown.esc="inputEvent('esc', $event)"
+                            @keydown.enter="inputEvent('enter', $event)"
+                            @keydown.space="inputEvent('space', $event)"
+                            >
+                        </textarea>
 
                         <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
                     </div>
@@ -103,9 +105,9 @@
             </div>
         </div>
 
-        <div class="select-bar">
+        <div class="select-bar" v-if="type__ === 'select'" v-show="selectOpen__">
             <slot v-for="item in items__" :key="item" :data="item" :value="item.value" :label="item.label">
-                <button type="button" class="select-item" @click="value__ = item.value">
+                <button type="button" class="select-item" @click="clickSelectValue(item.value)">
                     <div class="select-item-label">{{item.label}}</div>
                 </button>
             </slot>
@@ -262,6 +264,7 @@
                 valid__: true,
                 focus__: false,
                 obfuscated__: true,
+                selectOpen__: false,
                 errors: {},
             }
         },
@@ -421,7 +424,17 @@
             },
         },
 
+        watch: {
+            focus__() {
+                console.log(this.focus__)
+            },
+        },
+
         methods: {
+            focus() {
+                this.$refs.input.focus()
+            },
+
             input(value) {
                 this.$emit('update:modelValue', value)
             },
@@ -434,6 +447,28 @@
                     case 'focus': this.focus__ = true; break;
                     case 'blur': this.focus__ = false; this.onBlurValidation(); break;
                 }
+            },
+
+
+
+            openSelect() {
+                this.selectOpen__ = true
+            },
+
+            closeSelect() {
+                this.selectOpen__ = false
+            },
+
+            clickSelectValue(value) {
+                this.selectValue(value)
+                console.log(value)
+                this.focus()
+                this.closeSelect()
+            },
+
+            selectValue(value) {
+                this.value__ = value
+                this.input(value)
             },
             
 
@@ -476,7 +511,7 @@
                 this.value__ = ''
                 this.input(this.value__)
 
-                if (shoudFocus) this.$refs.input.focus()
+                if (shoudFocus) this.focus()
             },
         },
 
@@ -884,6 +919,36 @@
             z-index: 3
             border-radius: .325rem
             box-shadow: 0 0 .5rem rgba(0, 0, 0, .1)
+            display: flex
+            flex-direction: column
+
+            .select-item
+                border: none
+                background: transparent
+                color: var(--mui-color__)
+                height: 2em
+                width: 100%
+                padding: 0 1em
+                display: flex
+                align-items: center
+                justify-content: flex-start
+                font-size: inherit
+                font-family: inherit
+                line-height: 1.5
+                user-select: none
+                cursor: pointer
+                word-break: break-all
+                transition: all 100ms
+
+                &:hover
+                    background: var(--mui-background-secondary__)
+                    color: var(--mui-color__)
+
+                .select-item-label
+                    flex: 1
+                    font-size: .8em
+                    display: flex
+                    justify-content: inherit
 
         .bottom-bar
             height: 1.3em
