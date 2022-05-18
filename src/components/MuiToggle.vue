@@ -348,6 +348,7 @@
             border-radius: 1em
             border: 2px solid transparent
             transition: all 50ms ease-in-out
+            position: relative
 
             border-color: var(--mui-color__)
             background: var(--mui-color__)
