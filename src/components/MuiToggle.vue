@@ -301,7 +301,7 @@
             width: 1.25em
             display: flex
             align-items: center
-            justify-content: center
+            justify-content: flex-start
             flex: none
             position: relative
 

@@ -36,14 +36,14 @@
                             :aria-disabled="disabled"
                             @input="input($event.target.value)"
                             @focus="inputEvent('focus', $event)"
-                            @blur="inputEvent('blur', $event)"
+                            @blur="inputEvent('blur', $event); handleSelectClose($event)"
                             @keydown="inputEvent('keydown', $event)"
                             @keyup="inputEvent('keyup', $event)"
                             @keypress="inputEvent('keypress', $event)"
                             @change="inputEvent('change', $event)"
                             @keydown.esc="inputEvent('esc', $event)"
-                            @keydown.enter="inputEvent('enter', $event)"
-                            @keydown.space="inputEvent('space', $event)"
+                            @keydown.enter="inputEvent('enter', $event); handleSelectOpen($event)"
+                            @keydown.space="inputEvent('space', $event); handleSelectOpen($event)"
                             >
 
                         <textarea v-else ref="input" class="input"
@@ -281,6 +281,10 @@
                     this.instantValidation()
                 },
             },
+
+            focus__() {
+                console.log(this.focus__)
+            },
         },
 
         computed: {
@@ -424,12 +428,6 @@
             },
         },
 
-        watch: {
-            focus__() {
-                console.log(this.focus__)
-            },
-        },
-
         methods: {
             focus() {
                 this.$refs.input.focus()
@@ -455,15 +453,32 @@
                 this.selectOpen__ = true
             },
 
+            handleSelectOpen(e) {
+                if (this.type__ !== 'select') return
+
+                e.preventDefault()
+                this.openSelect()
+            },
+
             closeSelect() {
                 this.selectOpen__ = false
             },
 
+            handleSelectClose(e) {
+                if (this.type__ !== 'select') return
+
+                e?.preventDefault()
+
+                if (this.selectOpen__)
+                {
+                    this.focus()
+                }
+            },
+
             clickSelectValue(value) {
                 this.selectValue(value)
-                console.log(value)
-                this.focus()
                 this.closeSelect()
+                console.log(value)
             },
 
             selectValue(value) {
