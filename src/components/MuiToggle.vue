@@ -1,11 +1,12 @@
 <template>
-    <div class="mui-container"
+    <div class="mui-toggle mui-container"
         :class="classes__"
         :tabindex="tabindex__"
         :role="type__"
         :aria-checked="internalValue__"
         :disabled="disabled"
         :aria-disabled="disabled"
+        :aria-readonly="readonly"
         @click="inputEvent('input', $event); toggle($event)"
         @focus="inputEvent('focus', $event)"
         @blur="inputEvent('blur', $event)"
@@ -47,11 +48,11 @@
             </div>
         </div>
 
-        <div class="label" v-if="$slots.appendLabel || appendLabel">
-            <slot name="appendLabel">{{appendLabel}}</slot>
+        <div class="label" v-if="$slots.label || label">
+            <slot name="label">{{label}}</slot>
         </div>
 
-        <div class="border" v-if="hasBorder__"></div>
+        <div class="border" v-if="border"></div>
     </div>
 </template>
 
@@ -78,6 +79,11 @@
                 default: false,
             },
 
+            readonly: {
+                type: Boolean,
+                default: false,
+            },
+
             required: {
                 type: Boolean,
                 default: false,
@@ -93,22 +99,22 @@
                 default: '',
             },
 
-            prependValue: {
+            offValue: {
                 type: [Boolean, String, Number],
                 default: false,
             },
 
-            appendLabel: {
+            label: {
                 type: String,
                 default: '',
             },
             
-            appendValue: {
+            value: {
                 type: [Boolean, String, Number],
                 default: true,
             },
 
-            noBorder: {
+            border: {
                 type: Boolean,
                 default: false,
             },
@@ -137,7 +143,7 @@
 
         computed: {
             value__() {
-                return this.internalValue__ ? this.appendValue : this.prependValue
+                return this.internalValue__ ? this.value : this.offValue
             },
 
             classes__() {
@@ -156,19 +162,19 @@
             },
 
             dataType__() {
-                return typeof this.prependValue !== 'boolean' || typeof this.appendValue !== 'boolean' ? 'string' : 'boolean'
+                return typeof this.offValue !== 'boolean' || typeof this.value !== 'boolean' ? 'string' : 'boolean'
             },
 
             hasBorder__() {
-                return (this.$slots.prependLabel || this.$slots.appendLabel || this.prependLabel || this.appendLabel) && !this.noBorder
+                return (this.$slots.prependLabel || this.$slots.label || this.prependLabel || this.label) && this.border
             },
         },
 
         methods: {
             parseValue(value) {
-                if (value === this.prependValue) return false
+                if (value === this.offValue) return false
 
-                if (value === this.appendValue) return true
+                if (value === this.value) return true
                 
                 if (typeof value === 'boolean') return value
 
@@ -195,6 +201,8 @@
             shouldBounceEvent(event) {
                 if (this.disabled) return true
 
+                if (this.readonly) return true
+
                 for (const element of event.path)
                 {
                     // Only go through child elements
@@ -217,7 +225,7 @@
     *
         box-sizing: border-box
 
-    .mui-container
+    .mui-toggle.mui-container
         font-size: 1rem
         --mui-border-color__: var(--mui-border-color, #888)
         
@@ -234,7 +242,7 @@
         vertical-align: top
         display: inline-flex
         align-items: center
-        justify-content: center
+        justify-content: flex-start
         gap: 1em
         padding-inline: 0.625em
         padding-block: .5em
@@ -279,7 +287,6 @@
 
 
         &.disabled
-            pointer-events: none
             cursor: initial
             --mui-background__: var(--mui-disabled-background__)
             --mui-color__: var(--mui-disabled-color__)
@@ -348,7 +355,7 @@
             border-radius: 1em
             border: 2px solid transparent
             transition: all 50ms ease-in-out
-            position: relative
+            position: relative !important
 
             border-color: var(--mui-color__)
             background: var(--mui-color__)
@@ -388,7 +395,7 @@
             display: none
         
         .label
-            font-size: 0.8em
+            // font-size: 0.8em
             line-height: 1.25
             user-select: none
             flex: none

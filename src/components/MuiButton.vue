@@ -1,12 +1,10 @@
 <template>
-    <button class="mui-container"
-        role="button"
-        :type="type__"
-        :disabled="disabled"
-        :area-disabled="disabled"
+    <component class="mui-button mui-container" :is="as"
+        :role="role__"
+        :disabled="disabled || loading"
+        :area-disabled="disabled || loading"
         :aria-label="label"
-        :class="classes__"
-        @click="click()">
+        :class="classes__">
 
         <div class="icon" v-if="iconLeft">{{iconLeft}}</div>
         <span class="content">
@@ -19,7 +17,7 @@
         <div class="border" v-if="border"></div>
         <div class="background"></div>
         <div class="overlay"></div>
-    </button>
+    </component>
 </template>
 
 <script>
@@ -27,9 +25,9 @@
 
     export default {
         props: {
-            type: {
+            as: {
                 type: String,
-                default: 'button',
+                default: 'button'
             },
 
             variant: {
@@ -77,12 +75,8 @@
         },
 
         computed: {
-            type__() {
-                return ['submit', 'reset', 'button', 'link'].includes(this.type) ? this.type : 'button'
-            },
-
-            DOMType__() {
-                return this.type__ === 'link' ? 'a' : 'button'
+            role__() {
+                return ['a', 'Link'].includes(this.as) ? 'link' : 'button'
             },
 
             variant__() {
@@ -91,7 +85,6 @@
 
             classes__() {
                 return [
-                    `button-type-${this.type__}`,
                     `button-size-${this.size__}`,
                     `button-variant-${this.variant__}`,
                     `button-color-${this.presetColor__}`,
@@ -111,13 +104,6 @@
             },
         },
 
-        methods: {
-            click() {
-                if (this.loading) return false
-                this.$emit('click')
-            },
-        },
-
         components: {
             MuiLoader,
         },
@@ -128,7 +114,7 @@
     *
         box-sizing: border-box
 
-    .mui-container
+    .mui-button.mui-container
         font-size: 1rem
 
         --mui-background__: var(--primary, #650db4)
@@ -142,8 +128,9 @@
         display: inline-flex
         align-items: center
         justify-content: center
-        gap: 1em
+        gap: .8em
         text-align: center
+        text-decoration: none
         letter-spacing: .05em
         font-family: inherit
         font-weight: 500
@@ -161,6 +148,8 @@
                 opacity: 0.1
 
         &:focus
+            outline: none
+
             .overlay
                 opacity: 0.17
 
@@ -213,17 +202,17 @@
         &.button-size-small
             height: 2em
             padding: 0 .9em
-            gap: .9em
+            gap: .7em
 
         &.button-size-normal
             height: 2.5em
             padding: 0 1em
-            gap: 1em
+            gap: .8em
 
         &.button-size-large
             height: 3em
             padding: 0 1.75em
-            gap: 1.75em
+            gap: 1.55em
 
 
 

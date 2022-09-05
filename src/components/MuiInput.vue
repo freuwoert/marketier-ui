@@ -1,7 +1,7 @@
 <template>
-    <label class="mui-container" :class="classes__">
+    <label class="mui-input mui-container" :id="nativeId || (id ? 'label-for-'+id : null)" :class="classes__">
         <div class="box-wrapper" @click="openSelect()">
-            <div class="border" v-if="!noBorder"></div>
+            <div class="border" v-if="border"></div>
 
             <div class="side-wrapper">
                 <div class="side-icon" v-if="iconLeft__"><span>{{iconLeft__}}</span></div>
@@ -15,7 +15,8 @@
                     <span class="prefix" v-if="prefix">{{prefix}}</span>
 
                     <div class="input-compactor">
-                        <input v-if="type__ !== 'textarea'" ref="input" class="input"
+                        <component ref="input" class="input"
+                            :is="as__"
                             :pattern="pattern"
                             :autocomplete="autocomplete"
                             :spellcheck="spellcheck"
@@ -23,6 +24,7 @@
                             :required="required"
                             :readonly="readonly__"
                             :tabindex="tabindex__"
+                            :id="id"
                             :name="name"
                             :title="computedTitle__"
                             :type="computedType__"
@@ -30,7 +32,9 @@
                             :max="max__"
                             :minlength="min__"
                             :maxlength="max__"
-                            v-model="value__"
+                            :step="step__"
+                            :autofocus="autofocus"
+                            :value="value__"
                             :aria-required="required"
                             :aria-label="label"
                             :aria-disabled="disabled"
@@ -44,36 +48,7 @@
                             @keydown.esc="inputEvent('esc', $event)"
                             @keydown.enter="inputEvent('enter', $event); handleSelectOpen($event)"
                             @keydown.space="inputEvent('space', $event); handleSelectOpen($event)"
-                            >
-
-                        <textarea v-else ref="input" class="input"
-                            :pattern="pattern"
-                            :autocomplete="autocomplete"
-                            :spellcheck="spellcheck"
-                            :disabled="disabled"
-                            :required="required"
-                            :readonly="readonly__"
-                            :tabindex="tabindex__"
-                            :name="name"
-                            :title="computedTitle__"
-                            :minlength="min__"
-                            :maxlength="max__"
-                            v-model="value__"
-                            :aria-required="required"
-                            :aria-label="label"
-                            :aria-disabled="disabled"
-                            @input="input($event.target.value)"
-                            @focus="inputEvent('focus', $event)"
-                            @blur="inputEvent('blur', $event)"
-                            @keydown="inputEvent('keydown', $event)"
-                            @keyup="inputEvent('keyup', $event)"
-                            @keypress="inputEvent('keypress', $event)"
-                            @change="inputEvent('change', $event)"
-                            @keydown.esc="inputEvent('esc', $event)"
-                            @keydown.enter="inputEvent('enter', $event)"
-                            @keydown.space="inputEvent('space', $event)"
-                            >
-                        </textarea>
+                        ></component>
 
                         <div class="placeholder" v-if="placeholder">{{placeholder}}</div>
                     </div>
@@ -141,6 +116,16 @@
             type: {
                 type: String,
                 default: 'text',
+            },
+
+            id: {
+                type: String,
+                default: null,
+            },
+
+            nativeId: {
+                type: String,
+                default: '',
             },
 
             name: {
@@ -222,6 +207,11 @@
                 default: 'off',
             },
 
+            autofocus: {
+                type: Boolean,
+                default: false,
+            },
+
             spellcheck: {
                 type: Boolean,
                 default: false,
@@ -237,7 +227,12 @@
                 default: null,
             },
 
-            noBorder: {
+            step: {
+                type: [Number, String],
+                default: null,
+            },
+
+            border: {
                 type: Boolean,
                 default: false,
             },
@@ -277,17 +272,21 @@
             modelValue: {
                 immediate: true,
                 handler(newValue) {
-                    this.value__ = newValue
+                    this.value__ = this.parse(newValue)
                     this.instantValidation()
                 },
             },
 
-            focus__() {
-                console.log(this.focus__)
-            },
+            // focus__() {
+            //     console.log(this.focus__)
+            // },
         },
 
         computed: {
+            as__() {
+                return this.type__ === 'textarea' ? 'textarea' : 'input'
+            },
+
             type__() {
                 return ['text', 'email', 'number', 'url', 'password', 'search', 'tel', 'textarea', 'select'].includes(this.type) ? this.type : 'text'
             },
@@ -352,6 +351,12 @@
 
             max__() {
                 if (!isNaN(Number(this.max)) && this.max !== null) return Number(this.max)
+
+                return null
+            },
+
+            step__() {
+                if (!isNaN(Number(this.step)) && this.step !== null) return Number(this.step)
 
                 return null
             },
@@ -434,7 +439,8 @@
             },
 
             input(value) {
-                this.$emit('update:modelValue', value)
+                this.value__ = this.parse(value)
+                this.$emit('update:modelValue', this.value__)
             },
 
             inputEvent(type, event) {
@@ -445,6 +451,10 @@
                     case 'focus': this.focus__ = true; break;
                     case 'blur': this.focus__ = false; this.onBlurValidation(); break;
                 }
+            },
+
+            parse(value) {
+                return this.type__ === 'number' ? Number(value) : value
             },
 
 
@@ -478,7 +488,6 @@
             clickSelectValue(value) {
                 this.selectValue(value)
                 this.closeSelect()
-                console.log(value)
             },
 
             selectValue(value) {
@@ -526,6 +535,8 @@
                 this.value__ = ''
                 this.input(this.value__)
 
+                this.$emit('clear')
+
                 if (shoudFocus) this.focus()
             },
         },
@@ -542,7 +553,7 @@
     *
         box-sizing: border-box
 
-    .mui-container
+    .mui-input.mui-container
         font-size: 1rem
         --base-height: 3em
         --mui-background__: var(--mui-background, #fff)
@@ -836,7 +847,7 @@
                         padding: 0
                         border: none
                         background: none
-                        border-radius: inherit
+                        border-radius: 3px
                         font-family: inherit
                         font-size: inherit
                         resize: none
@@ -896,6 +907,7 @@
                 position: absolute
                 top: 0
                 left: 0
+                z-index: 1
                 display: flex
                 align-items: center
                 padding-block: 0
