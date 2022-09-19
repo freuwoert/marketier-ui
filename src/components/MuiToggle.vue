@@ -202,8 +202,10 @@
                 if (this.disabled) return true
 
                 if (this.readonly) return true
+                
+                var path = event.path || (event.composedPath && event.composedPath())
 
-                for (const element of event.path)
+                for (const element of path)
                 {
                     // Only go through child elements
                     if (element === this.$el) return false
